@@ -16,8 +16,16 @@ Assets/Resources/art/
 ├── ships/      船        miner.png / transport.png
 ├── resources/  資源      <資源id>.png
 ├── ui/         UIアイコン coin.png / cube.png / bar.png / lock.png
-└── bg/         背景      starfield.png
+├── bg/         背景      starfield.png
+└── mining/     採掘ロボ  robot.png（アニメのスプライトシート）
 ```
+
+### mining/（採掘ロボのアニメ)
+- **`mining/robot.png`** … つるはしで採掘する可愛いロボの**スプライトシート**。
+  **正方コマを横に並べた1枚**にする(実行時に自動でコマ分割・ループ再生、8fps)。
+  - 例: 1コマ 64×64 を 8 コマ → **512×64** の帯。コマ数はコード側が `幅÷高さ` で自動判定(正方前提)。
+  - 採掘中の惑星上に表示される。宇宙船は到着すると**着地して小さくなり**、その横でロボが掘る想定。
+  - PNG が無ければロボは出ず、従来の鉱石片エフェクト+着地縮小のみ。
 
 ### bodies/（天体）
 解決順(先に見つかったものを使う):
@@ -67,9 +75,13 @@ Assets/Resources/art/
 各 PNG は Unity インスペクタで以下にしてください(既定の 2D テンプレなら自動で近い設定):
 
 - **Texture Type: `Sprite (2D and UI)`** ← これが必須(`SpriteBank` は `Sprite` として読む)
-- Sprite Mode: `Single`
+- Sprite Mode: `Single`(採掘ロボのシートも Single でOK。コード側で分割します)
 - Pixels Per Unit: 任意(表示サイズはコード側が制御するため見た目に影響しません)
 - Alpha: 透過 PNG 推奨(天体・船・資源・UIは背景を透過に)
+- **リアル志向(採用)**:`Filter Mode: Bilinear` / `Generate Mip Maps: ON`
+  にするとズームイン/アウトの両方で滑らかに出ます。
+- **ズーム前提で高解像度**に:天体はシームレスズームで画面いっぱいまで拡大されるため、
+  **1024〜2048px 四方**を推奨(512だと寄った時に甘くなる)。`Max Size` を 2048 に。
 
 > Texture Type が `Default` のままだと `Resources.Load<Sprite>` が null を返し、
 > プレースホルダのままになります。差し替わらない時はまずここを確認してください。

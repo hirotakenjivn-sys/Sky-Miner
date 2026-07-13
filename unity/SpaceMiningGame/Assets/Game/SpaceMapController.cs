@@ -83,6 +83,7 @@ namespace SpaceMining.Game
         MarketPanel _marketPanel;
         OfflinePanel _offline;
         FleetSimulator _sim;
+        Refinery _refinery;
         float _saveTimer;
         Sprite _circle;
         Sprite _ringSprite;
@@ -102,15 +103,22 @@ namespace SpaceMining.Game
         public Market Market => _market;
         public SpeedCurve Speed => _speed;
 
-        // 当日市況の売却単価(市況があればそれ、無ければ基準価格へフォールバック)
+        // 当日市況の売却単価(市況があればそれ、無ければ基準価格へフォールバック)。
+        // 金属(精錬品)は 元鉱石の当日単価 × RefineFactor で二層価格にする。
         public double PriceOf(string id)
         {
+            if (Refinery.IsRefinedId(id))
+                return PriceOf(Refinery.OreOf(id)) * BalanceOverride.RefineFactor;
             var m = _market?.Get(id);
             if (m != null) return m.nova_per_kg;
             return _prices.ById(id)?.nova_per_kg ?? 0;
         }
-        // 前日比(比率)。市況が無い/該当なしは 0。
-        public double Change1d(string id) => _market?.Get(id)?.change_1d ?? 0;
+        // 前日比(比率)。金属は元鉱石の前日比を流用。市況が無い/該当なしは 0。
+        public double Change1d(string id)
+        {
+            if (Refinery.IsRefinedId(id)) return Change1d(Refinery.OreOf(id));
+            return _market?.Get(id)?.change_1d ?? 0;
+        }
 
         // 採掘資源の解禁(市況パネルで解禁。天体に出現する資源を当日単価の安い順)
         readonly List<string> _unlockOrder = new List<string>();
@@ -192,6 +200,12 @@ namespace SpaceMining.Game
         public OfflinePanel Offline => _offline;
         public FleetSimulator Sim => _sim;
 
+        // 全画面パネル(店/強化/市況/オフライン)がどれか開いているか。
+        // IMGUI描画(採掘ゲージ/ポップ)を前面に出さないためのガードに使う。
+        public bool AnyFullPanelOpen =>
+            (_store != null && _store.IsOpen) || (_upgrade != null && _upgrade.IsOpen)
+            || (_marketPanel != null && _marketPanel.IsOpen) || (_offline != null && _offline.IsOpen);
+
         // 強化の効果倍率(採掘速度・積載)。FleetSimulator が基準値に掛ける。
         public double MineRateMult => _upgradeCurve.EffectMult(_state.MineLevel);
         public double CargoMult => _upgradeCurve.EffectMult(_state.CargoLevel);
@@ -258,6 +272,12 @@ namespace SpaceMining.Game
             _sim = simGo.AddComponent<FleetSimulator>();
             _sim.Bind(this);
 
+            // 精錬所(在庫の鉱石→金属を背景で処理)
+            var refGo = new GameObject("Refinery");
+            refGo.transform.SetParent(transform, false);
+            _refinery = refGo.AddComponent<Refinery>();
+            _refinery.Bind(this);
+
             // 本日の市況パネル
             var mktGo = new GameObject("MarketPanel");
             mktGo.transform.SetParent(transform, false);
@@ -276,6 +296,7 @@ namespace SpaceMining.Game
             if (elapsed >= 1)
             {
                 var result = _sim.ApplyOffline(elapsed);
+                _refinery.ApplyOffline(elapsed);   // 留守中も精錬継続(在庫の鉱石→金属)
                 if (result.HasGains) _offline.Show(result);
             }
 

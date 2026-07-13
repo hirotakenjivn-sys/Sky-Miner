@@ -63,6 +63,7 @@ namespace SpaceMining.Game
             public int cargoTotal;
             public float mineProgress; // 採掘進捗 0..1(頭上ゲージ用)
             public float spawnAccum;   // 採掘VFXの生成タイマー
+            public float robotTimer;   // 採掘ロボのコマ送りタイマー
             public Vector2 worldPos;
             public bool visible;
         }
@@ -90,6 +91,8 @@ namespace SpaceMining.Game
         SpaceMapController _ctrl;
         readonly Dictionary<Ship, Runtime> _rt = new Dictionary<Ship, Runtime>();
         readonly Dictionary<Ship, Transform> _marker = new Dictionary<Ship, Transform>();
+        readonly Dictionary<Ship, Transform> _robot = new Dictionary<Ship, Transform>();  // 採掘ロボのスプライト
+        const float RobotFps = 8f;
         readonly Dictionary<int, LineRenderer> _routes = new Dictionary<int, LineRenderer>();
         readonly List<string> _arrivalLog = new List<string>();
         readonly List<OreBit> _oreBits = new List<OreBit>();
@@ -114,7 +117,34 @@ namespace SpaceMining.Game
         public void ResetShipVisuals()
         {
             foreach (var kv in _marker) if (kv.Value != null) Destroy(kv.Value.gameObject);
-            _marker.Clear(); _rt.Clear(); _shipOffset.Clear();
+            foreach (var kv in _robot) if (kv.Value != null) Destroy(kv.Value.gameObject);
+            _marker.Clear(); _robot.Clear(); _rt.Clear(); _shipOffset.Clear();
+        }
+
+        // 採掘中の船の位置に「つるはしロボ」アニメを再生(art/mining/robot.png があれば)。
+        // 無ければ非表示(従来の鉱石片VFX+着地縮小のまま)。描画のみ・採掘計算には不干渉。
+        void UpdateMiningRobot(Ship ship, Runtime rt, Vector2 spot)
+        {
+            var frames = SpriteBank.MiningRobotFrames();
+            bool show = rt.phase == Phase.Mining && frames != null && frames.Length > 0;
+            if (!_robot.TryGetValue(ship, out var tr))
+            {
+                if (!show) return;
+                var go = new GameObject($"robot_{ship.Id}");
+                go.transform.SetParent(_ctrl.MapRoot, false);
+                var sr = go.AddComponent<SpriteRenderer>();
+                sr.sortingOrder = 7;   // 着地した船より前面
+                tr = go.transform;
+                _robot[ship] = tr;
+            }
+            var rsr = tr.GetComponent<SpriteRenderer>();
+            if (rsr.enabled != show) rsr.enabled = show;
+            if (!show) return;
+            rt.robotTimer += Time.deltaTime * _ctrl.State.TimeScale;
+            int f = ((int)(rt.robotTimer * RobotFps)) % frames.Length;
+            rsr.sprite = frames[f];
+            tr.position = new Vector3(spot.x, spot.y, -0.1f);
+            tr.localScale = Vector3.one * _ctrl.CurrentIconWorld * 0.7f;
         }
 
         // オフライン進行:不在秒数ぶん、派遣中の各船が何便こなせたかを期待値で計算して在庫へ加算。
@@ -202,6 +232,7 @@ namespace SpaceMining.Game
                     Vector2 dockPos = station + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * ringR;
                     rt.worldPos = dockPos; rt.visible = true;
                     SetMarker(ship, dockPos, true);
+                    UpdateMiningRobot(ship, rt, dockPos);   // 待機=採掘してないのでロボは隠れる
                     idleSeen++;
                     continue;
                 }
@@ -431,7 +462,8 @@ namespace SpaceMining.Game
                         RollInto(body, rt.cargo, ref rt.cargoTotal, spot);
                         rt.rollsDone++;
                     }
-                    rt.mineProgress = (float)rt.rollsDone / RollsPerSession;
+                    // 抽選の合間の経過も足してゲージを連続的に(カクつき解消)。0→1 を滑らかに満たす。
+                    rt.mineProgress = Mathf.Clamp01((rt.rollsDone + rt.rollTimer / interval) / RollsPerSession);
                     if (rt.rollsDone >= RollsPerSession) { rt.phase = Phase.Return; rt.elapsed = 0; }
                     break;
                 default: // Return
@@ -445,7 +477,9 @@ namespace SpaceMining.Game
                     break;
             }
             rt.worldPos = p; rt.visible = true;
-            SetMarker(ship, p, true);
+            // 採掘中は着地して小さく(=惑星に降りた表現)。往復中は通常サイズ。
+            SetMarker(ship, p, true, rt.phase == Phase.Mining ? LandedScale : 1f);
+            UpdateMiningRobot(ship, rt, spot);
         }
 
         // 採掘船・常駐:天体に留まり現地ストレージへ抽選で掘り込む。満杯で採掘停止。
@@ -591,7 +625,9 @@ namespace SpaceMining.Game
             return rt;
         }
 
-        void SetMarker(Ship ship, Vector2 pos, bool visible)
+        const float LandedScale = 0.5f;   // 着地(採掘中)は宇宙船を小さく=惑星に降りた表現
+
+        void SetMarker(Ship ship, Vector2 pos, bool visible, float scaleMul = 1f)
         {
             if (!_marker.TryGetValue(ship, out var tr))
             {
@@ -612,7 +648,7 @@ namespace SpaceMining.Game
             if (srr.enabled != visible) srr.enabled = visible;
             if (!visible) return;
             tr.position = new Vector3(pos.x, pos.y, 0);
-            tr.localScale = Vector3.one * _ctrl.CurrentIconWorld * 0.42f;
+            tr.localScale = Vector3.one * _ctrl.CurrentIconWorld * 0.42f * scaleMul;
             // 機首を原点(地球)から外向き(放射方向)へ。スプライトは +Y が機首なので、
             // 目標方向へ回す。原点付近は回さない(ゼロ除算回避)。描画のみ・移動計算には不干渉。
             if (pos.sqrMagnitude > 1e-3f)
@@ -726,6 +762,8 @@ namespace SpaceMining.Game
         void OnGUI()
         {
             if (_ctrl == null) return;
+            // 全画面パネル表示中は IMGUI のゲージ/ポップを描かない(uGUIパネルの前面に透けて出るのを防ぐ)。
+            if (_ctrl.AnyFullPanelOpen) return;
             if (!_gaugeReady)
             {
                 _gaugeReady = true;

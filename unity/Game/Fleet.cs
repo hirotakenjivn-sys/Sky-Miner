@@ -75,31 +75,49 @@ namespace SpaceMining.Game
         public int AssignedCount(int bodyNo, ShipType t)
             => Ships.Count(s => s.Type == t && s.AssignedBodyNo == bodyNo);
 
-        // ある天体への割り当て隻数を desired に合わせる(idle から補充 / 余剰を idle へ戻す)。
-        // 返り値 = 実際に到達した割り当て隻数(idle 不足で desired に届かない場合あり)。
-        public int SetAssignment(int bodyNo, ShipType t, int desired)
+        // ある天体への割り当て隻数を desired に合わせる。補充は 待機 → 他天体(隻数の多い順)の順。
+        // 他天体から回した場合は pulled に「(移動元天体no, 隻数)」を積む(トースト表示用・null可)。
+        // 返り値 = 実際に到達した割り当て隻数。
+        public int SetAssignment(int bodyNo, ShipType t, int desired,
+                                 List<(int fromNo, int count)> pulled = null)
         {
-            desired = desired < 0 ? 0 : desired;
+            desired = desired < 0 ? 0 : (desired > TotalCount(t) ? TotalCount(t) : desired);
             var here = Ships.Where(s => s.Type == t && s.AssignedBodyNo == bodyNo).ToList();
             if (desired < here.Count)
             {
-                // 余剰を待機へ戻す
                 for (int i = 0; i < here.Count - desired; i++)
-                    here[i].AssignedBodyNo = CelestialBody.StationNo;
+                    here[i].AssignedBodyNo = CelestialBody.StationNo;   // 余剰は待機へ
+                return AssignedCount(bodyNo, t);
             }
-            else if (desired > here.Count)
+            int need = desired - here.Count;
+            // 1) 待機船から
+            foreach (var s in Ships.Where(s => s.Type == t && s.IsIdle).ToList())
             {
-                // 待機船から補充(足りなければあるだけ)
-                var idle = Ships.Where(s => s.Type == t && s.IsIdle).ToList();
-                int add = System.Math.Min(desired - here.Count, idle.Count);
-                for (int i = 0; i < add; i++)
-                    idle[i].AssignedBodyNo = bodyNo;
+                if (need <= 0) break;
+                s.AssignedBodyNo = bodyNo; need--;
+            }
+            // 2) 足りなければ他天体から(隻数の多い順に1隻ずつ回す)
+            while (need > 0)
+            {
+                var top = Ships.Where(s => s.Type == t && s.AssignedBodyNo != bodyNo
+                                          && s.AssignedBodyNo != CelestialBody.StationNo)
+                    .GroupBy(s => s.AssignedBodyNo)
+                    .OrderByDescending(g => g.Count())
+                    .FirstOrDefault();
+                if (top == null) break;   // これ以上回せる船がない
+                int fromNo = top.Key;
+                top.First().AssignedBodyNo = bodyNo; need--;
+                if (pulled != null)
+                {
+                    int idx = pulled.FindIndex(p => p.fromNo == fromNo);
+                    if (idx >= 0) pulled[idx] = (fromNo, pulled[idx].count + 1);
+                    else pulled.Add((fromNo, 1));
+                }
             }
             return AssignedCount(bodyNo, t);
         }
 
-        // この天体へ desired を割り当てる上限(現在ここに居る数 + 待機数)
-        public int MaxAssignable(int bodyNo, ShipType t)
-            => AssignedCount(bodyNo, t) + IdleCount(t);
+        // この天体へ割り当て可能な上限 = 艦隊の総数(他天体からも回せるため)。
+        public int MaxAssignable(int bodyNo, ShipType t) => TotalCount(t);
     }
 }

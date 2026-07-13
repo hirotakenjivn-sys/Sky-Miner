@@ -224,12 +224,23 @@ namespace SpaceMining.Game
             UiKit.Stretch(dg.rectTransform);
             dispatch.onClick.AddListener(() =>
             {
-                int gotM = f.SetAssignment(_body.No, ShipType.Miner, _pendingMiner);
-                int gotT = f.SetAssignment(_body.No, ShipType.Transport, _pendingTransport);
+                var pulled = new System.Collections.Generic.List<(int fromNo, int count)>();
+                int gotM = f.SetAssignment(_body.No, ShipType.Miner, _pendingMiner, pulled);
+                int gotT = f.SetAssignment(_body.No, ShipType.Transport, _pendingTransport, pulled);
                 _pendingMiner = gotM; _pendingTransport = gotT;
-                _ctrl.Toast(gotM + gotT == 0
-                    ? $"{_body.Name} から全船を引き揚げました"
-                    : $"{_body.Name} へ 採掘船{gotM}・輸送船{gotT} を派遣");
+                if (gotM + gotT == 0)
+                    _ctrl.Toast($"{_body.Name} から全船を引き揚げました");
+                else
+                {
+                    // 他天体から回した場合は「◯◯から N隻 移動」を併記(何が起きたか見える=ミス回避)
+                    string moved = "";
+                    foreach (var p in pulled)
+                    {
+                        var src = _ctrl.Data.ByNo(p.fromNo);
+                        moved += $" / {(src != null ? src.Name : "他天体")}から{p.count}隻移動";
+                    }
+                    _ctrl.Toast($"{_body.Name} へ 宇宙船{gotT} を派遣{moved}");
+                }
                 Rebuild();
             });
         }

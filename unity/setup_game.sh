@@ -40,6 +40,7 @@ cp "$ROOT/unity/Game/BodyMaster.cs" \
    "$ROOT/unity/Game/Market.cs" \
    "$ROOT/unity/Game/MarketPanel.cs" \
    "$ROOT/unity/Game/Inventory.cs" \
+   "$ROOT/unity/Game/Refinery.cs" \
    "$ROOT/unity/Game/UiIcons.cs" \
    "$ROOT/unity/Game/UiKit.cs" \
    "$ROOT/unity/Game/UiRoot.cs" \

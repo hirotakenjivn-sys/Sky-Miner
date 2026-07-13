@@ -25,10 +25,12 @@ namespace SpaceMining.Game
         // 実時間のペースを保つよう、価格は約4倍に引き上げる(要調整)。
         // 進行シミュ(2026-07-13)でリバランス:旧値は新産出モデルの収入に対しコスト過大だった。
         // 天体解禁 = 実距離が延びるほど予算Bが増える(下記)ので、解禁費用も相応に。
-        public const double UnlockPriceScale = 0.006;   // 天体解禁費 = unlock_price_nova × これ
-        public const double UpgradeCostScale = 0.0005;  // 強化/資源解禁費 = 曲線 × これ
+        // 初期1隻化(収入~1/3)+「次の惑星まで手持無沙汰」対策で早いテンポへ再調整(2026-07-14)。
+        // 目安(1隻・月):初回強化~40s / 2隻目~3分 / エロス~4分。要Play体感で微調整。
+        public const double UnlockPriceScale = 0.0025;  // 天体解禁費 = unlock_price_nova × これ
+        public const double UpgradeCostScale = 0.00025; // 強化/資源解禁費 = 曲線 × これ
         // 宇宙船の増設費 = 曲線 × UpgradeCostScale × これ(船は収入をほぼ倍化するので割高。要調整)
-        public const double ShipCostMult = 8.0;
+        public const double ShipCostMult = 5.0;
 
         // ── 産出個数バランス(A案:惑星ごと固定予算B・高単価は伝説級レア。[[yield-balance-model]])
         // すべて暫定値。正式には進行シミュ(充足率)と合わせて xlsx で調整する。
@@ -39,5 +41,12 @@ namespace SpaceMining.Game
         public const double YieldRarityGamma = 1.5;      // 個数 ∝ 単価^(−γ)。大きいほど高単価が伝説級レア
         public const double BulkPriceThreshold = 500.0;  // これ未満の単価=バルク素材(収入予算Bから除外)
         public const double BulkBaseCountPerSession = 2.0; // バルクの暫定固定個数/session(将来 体積単位で再設計)
+
+        // ── 精錬(鉱石→金属の二層価格。[[refining]])
+        // 金属売値 = 鉱石当日単価 × これ(= 回収率0.7 ÷ 品位0.35 = 2.0。将来 回収率強化で可変)。
+        public const double RefineFactor = 2.0;
+        // 精錬所の処理能力[個/秒](暫定。1隻の採掘レートと同程度に置き、船が増えると滞留する=
+        //  「安い鉱石を今売る/待って高い金属で売る」の選択が出る。将来は精錬能力の強化軸を追加可)。
+        public const double RefineUnitsPerSec = 0.1;
     }
 }

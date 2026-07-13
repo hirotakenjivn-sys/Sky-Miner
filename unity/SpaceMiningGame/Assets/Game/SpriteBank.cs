@@ -129,6 +129,33 @@ namespace SpaceMining.Game
         static Sprite ToSprite(Texture2D t)
             => Sprite.Create(t, new Rect(0, 0, t.width, t.height), new Vector2(0.5f, 0.5f), t.width);
 
+        // ------------------------------------------------------------ 採掘ロボのアニメ
+        // art/mining/robot.png(正方コマを横に並べたスプライトシート)を実行時にコマ分割して返す。
+        // 例: 256×256 を 8 コマ = 2048×256。PNG が無ければ null(=ロボ非表示・従来の採掘演出のまま)。
+        // ピクセルアートは Import で Filter Mode=Point にすると綺麗(README 参照)。
+        static Sprite[] _robotFrames; static bool _robotChecked;
+        public static Sprite[] MiningRobotFrames()
+        {
+            if (_robotChecked) return _robotFrames;
+            _robotChecked = true;
+            var sheet = LoadPng("art/mining/robot");
+            if (sheet == null) { _robotFrames = null; return null; }
+            var tex = sheet.texture;
+            int h = tex.height;
+            int n = tex.width / Mathf.Max(1, h);   // 正方コマ横並びのコマ数
+            if (n < 2)
+            {
+                // 横帯でない(=1枚絵)ときは切り抜かず全体を1コマ静止として使う。
+                _robotFrames = new[] { sheet };
+                return _robotFrames;
+            }
+            _robotFrames = new Sprite[n];
+            for (int i = 0; i < n; i++)
+                _robotFrames[i] = Sprite.Create(tex, new Rect(i * h, 0, h, h),
+                                                new Vector2(0.5f, 0.4f), h);   // 足元寄りピボット
+            return _robotFrames;
+        }
+
         // ------------------------------------------------------------ 手続き: 天体(陰影付き球)
         // グレースケール輝度で球を描く(呼び出し側が種別色で tint)。種別ごとに:
         //   moon=小さめ+クレータ / dwarf=環 / asteroid=いびつ+小さめ / comet=コマ(淡い光冠) /
