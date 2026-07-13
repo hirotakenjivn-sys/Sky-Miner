@@ -100,7 +100,8 @@ namespace SpaceMining.Game
         readonly Dictionary<Ship, Vector2> _shipOffset = new Dictionary<Ship, Vector2>();
 
         // 「+数量」が下から上へフェードするポップ(到着=通常サイズ / 採掘=極小)
-        class Popup { public Vector2 worldPos; public string text; public float age, maxLife, scale; }
+        // resId は表示アイコンの色分け用(採掘個数の計算には一切影響しない表示メタデータ)。
+        class Popup { public Vector2 worldPos; public string text; public float age, maxLife, scale; public string resId; }
         readonly List<Popup> _popups = new List<Popup>();
 
         static readonly Color MinerColor = new Color(0.37f, 0.83f, 0.94f, 1f);      // cyan
@@ -108,6 +109,13 @@ namespace SpaceMining.Game
         static readonly Color RouteColor = new Color(0.37f, 0.83f, 0.94f, 0.55f);
 
         public void Bind(SpaceMapController ctrl) => _ctrl = ctrl;
+
+        // ⟲リセット用:全船のマーカーと実行時状態を破棄(次フレームで現艦隊ぶんを再生成)。
+        public void ResetShipVisuals()
+        {
+            foreach (var kv in _marker) if (kv.Value != null) Destroy(kv.Value.gameObject);
+            _marker.Clear(); _rt.Clear(); _shipOffset.Clear();
+        }
 
         // オフライン進行:不在秒数ぶん、派遣中の各船が何便こなせたかを期待値で計算して在庫へ加算。
         // 採掘は2時間バジェット、移動は無制限(=Tを2hで頭打ち)。抽選は期待値(目標×積載)で確定的に。
@@ -174,6 +182,12 @@ namespace SpaceMining.Game
 
             ComputeShipOffsets();   // 同一天体の複数隻を被らせない
 
+            // 待機(未派遣)船は地球(ステーション)周囲に駐機表示する(item④)。複数はリング状に並べる。
+            int idleCount = 0;
+            foreach (var s in _ctrl.Fleet.Ships)
+                if (s.AssignedBodyNo == CelestialBody.StationNo) idleCount++;
+            int idleSeen = 0;
+
             foreach (var ship in _ctrl.Fleet.Ships)
             {
                 var rt = GetRuntime(ship);
@@ -181,8 +195,14 @@ namespace SpaceMining.Game
 
                 if (target == CelestialBody.StationNo)
                 {
-                    rt.phase = Phase.Idle; rt.elapsed = 0; rt.cargo.Clear(); rt.cargoTotal = 0; rt.visible = false;
-                    SetMarker(ship, station, false);
+                    rt.phase = Phase.Idle; rt.elapsed = 0; rt.cargo.Clear(); rt.cargoTotal = 0;
+                    // 地球のすぐ外周に駐機(1隻=真上、複数=均等リング)。機首は外向き(SetMarker)。
+                    float ringR = _ctrl.CurrentIconWorld * 0.95f;
+                    float a = (idleCount <= 1 ? 90f : 90f + idleSeen * (360f / idleCount)) * Mathf.Deg2Rad;
+                    Vector2 dockPos = station + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * ringR;
+                    rt.worldPos = dockPos; rt.visible = true;
+                    SetMarker(ship, dockPos, true);
+                    idleSeen++;
                     continue;
                 }
 
@@ -310,7 +330,7 @@ namespace SpaceMining.Game
                 cargo[res.id] = c + n;
                 total += n;
                 _popups.Add(new Popup { worldPos = pos, text = $"+{n} {res.name_ja}",
-                    age = 0f, maxLife = 1.0f, scale = 0.5f });     // 極小
+                    age = 0f, maxLife = 1.0f, scale = 0.5f, resId = res.id });     // 極小
             }
         }
 
@@ -578,8 +598,12 @@ namespace SpaceMining.Game
                 var go = new GameObject($"ship_{ship.Id}_{ship.Type}");
                 go.transform.SetParent(_ctrl.MapRoot, false);
                 var sr = go.AddComponent<SpriteRenderer>();
-                sr.sprite = _ctrl.CircleSprite;
-                sr.color = ship.Type == ShipType.Miner ? MinerColor : TransportColor;
+                // 円マーカー→宇宙船シルエット(PNG art/ships/… があればそれ、無ければ手続きくさび形)。
+                // 手続き版はグレースケールなので採掘/輸送の色で tint(色分けは維持)。
+                bool shipIsArt;
+                sr.sprite = SpriteBank.Ship(ship.Type, out shipIsArt);
+                sr.color = shipIsArt ? Color.white
+                                     : (ship.Type == ShipType.Miner ? MinerColor : TransportColor);
                 sr.sortingOrder = 6;
                 tr = go.transform;
                 _marker[ship] = tr;
@@ -589,6 +613,13 @@ namespace SpaceMining.Game
             if (!visible) return;
             tr.position = new Vector3(pos.x, pos.y, 0);
             tr.localScale = Vector3.one * _ctrl.CurrentIconWorld * 0.42f;
+            // 機首を原点(地球)から外向き(放射方向)へ。スプライトは +Y が機首なので、
+            // 目標方向へ回す。原点付近は回さない(ゼロ除算回避)。描画のみ・移動計算には不干渉。
+            if (pos.sqrMagnitude > 1e-3f)
+            {
+                float ang = Mathf.Atan2(pos.y, pos.x) * Mathf.Rad2Deg - 90f;
+                tr.rotation = Quaternion.Euler(0f, 0f, ang);
+            }
         }
 
         // ------------------------------------------------------------ HUD(uGUI)+ 採掘ゲージ/ポップ(OnGUI)
@@ -753,7 +784,9 @@ namespace SpaceMining.Game
                 var prev = GUI.color;
                 GUI.color = new Color(1f, 1f, 1f, 1f - t);        // フェードアウト
                 GUI.Label(new Rect(lx, gy, tw, h), p.text, _sPopup);
-                UiIcons.Draw(UiIcons.Cube, lx + tw + 4f, gy, h, h * 0.7f);
+                // 資源別アイコン(採掘ポップ)。到着合計(resId=null)は汎用キューブ(=質量)。
+                var icon = string.IsNullOrEmpty(p.resId) ? UiIcons.Cube : UiIcons.ResourceIcon(p.resId);
+                UiIcons.Draw(icon, lx + tw + 4f, gy, h, h * 0.7f);
                 GUI.color = prev;
             }
             _sPopup.fontSize = _sPopupBase;   // 復元

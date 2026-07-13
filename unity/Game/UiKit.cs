@@ -58,13 +58,16 @@ namespace SpaceMining.Game
             }
         }
 
-        // ---- アイコン Sprite(UiIcons のテクスチャを流用)----
-        static Sprite _white, _coin, _cube, _bar, _lock, _circle;
-        public static Sprite White  { get { if (_white == null)  _white  = MakeWhite();               return _white;  } }
-        public static Sprite Coin   { get { if (_coin == null)   _coin   = ToSprite(UiIcons.Coin);    return _coin;   } }
-        public static Sprite Cube   { get { if (_cube == null)   _cube   = ToSprite(UiIcons.Cube);    return _cube;   } }
-        public static Sprite Bar    { get { if (_bar == null)    _bar    = ToSprite(UiIcons.Bar);     return _bar;    } }
-        public static Sprite Lock   { get { if (_lock == null)   _lock   = ToSprite(UiIcons.Lock);    return _lock;   } }
+        // ---- アイコン Sprite(スプライト・パイプライン経由。PNG(art/ui/…)があれば差し替わる)----
+        static Sprite _white;
+        public static Sprite White  { get { if (_white == null)  _white  = MakeWhite(); return _white; } }
+        public static Sprite Coin   => SpriteBank.Ui("coin", out _);
+        public static Sprite Cube   => SpriteBank.Ui("cube", out _);
+        public static Sprite Bar    => SpriteBank.Ui("bar",  out _);
+        public static Sprite Lock   => SpriteBank.Ui("lock", out _);
+
+        // 資源アイコン Sprite(uGUI パネル用)。PNG(art/resources/<id>.png)優先、無ければ手続き。
+        public static Sprite Resource(string id) => SpriteBank.Resource(id, out _);
 
         static Sprite ToSprite(Texture2D t)
             => Sprite.Create(t, new Rect(0, 0, t.width, t.height), new Vector2(0.5f, 0.5f), 100f);

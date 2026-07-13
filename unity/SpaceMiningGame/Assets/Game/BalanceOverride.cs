@@ -27,6 +27,8 @@ namespace SpaceMining.Game
         // 天体解禁 = 実距離が延びるほど予算Bが増える(下記)ので、解禁費用も相応に。
         public const double UnlockPriceScale = 0.006;   // 天体解禁費 = unlock_price_nova × これ
         public const double UpgradeCostScale = 0.0005;  // 強化/資源解禁費 = 曲線 × これ
+        // 宇宙船の増設費 = 曲線 × UpgradeCostScale × これ(船は収入をほぼ倍化するので割高。要調整)
+        public const double ShipCostMult = 8.0;
 
         // ── 産出個数バランス(A案:惑星ごと固定予算B・高単価は伝説級レア。[[yield-balance-model]])
         // すべて暫定値。正式には進行シミュ(充足率)と合わせて xlsx で調整する。

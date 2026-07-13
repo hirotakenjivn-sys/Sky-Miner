@@ -52,6 +52,8 @@ cp "$ROOT/unity/Game/BodyMaster.cs" \
    "$ROOT/unity/Game/OfflinePanel.cs" \
    "$ROOT/unity/Game/SpeedCurve.cs" \
    "$ROOT/unity/Game/FleetSimulator.cs" \
+   "$ROOT/unity/Game/SpriteBank.cs" \
+   "$ROOT/unity/Game/Starfield.cs" \
    "$ROOT/unity/Game/SpaceMapController.cs" "$PROJ/Assets/Game/"
 cp "$ROOT/unity/Game/Editor/GameSceneSetup.cs" \
    "$ROOT/unity/Game/Editor/GameSmokeTest.cs" "$PROJ/Assets/Game/Editor/"

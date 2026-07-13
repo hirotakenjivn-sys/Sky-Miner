@@ -28,22 +28,46 @@ namespace SpaceMining.Game
 
     public class Fleet
     {
-        // 初期艦隊構成:序盤は宇宙船(=Transport型)のみ。専用採掘船(Miner)は中盤スキルで登場。
+        // 初期艦隊構成:序盤は宇宙船(=Transport型)1隻のみ。強化で増設する(上限 MaxTransports)。
+        // 専用採掘船(Miner)は中盤スキルで登場。
         public const int InitialMiners = 0;
-        public const int InitialTransports = 3;
+        public const int InitialTransports = 1;
+        public const int MaxTransports = 6;   // 宇宙船の増設上限(設計ノブ)
 
         public readonly ShipStats Stats;
         public readonly List<Ship> Ships = new List<Ship>();
+        int _nextId;
 
         public Fleet(ShipStats stats,
                      int miners = InitialMiners, int transports = InitialTransports)
         {
             Stats = stats;
-            int id = 0;
             for (int i = 0; i < miners; i++)
-                Ships.Add(new Ship { Id = id++, Type = ShipType.Miner });
+                Ships.Add(new Ship { Id = _nextId++, Type = ShipType.Miner });
             for (int i = 0; i < transports; i++)
-                Ships.Add(new Ship { Id = id++, Type = ShipType.Transport });
+                Ships.Add(new Ship { Id = _nextId++, Type = ShipType.Transport });
+        }
+
+        public int TransportCount => Ships.Count(s => s.Type == ShipType.Transport);
+
+        // 宇宙船を1隻増設(待機状態で追加)。上限なら false。
+        public bool AddTransport()
+        {
+            if (TransportCount >= MaxTransports) return false;
+            Ships.Add(new Ship { Id = _nextId++, Type = ShipType.Transport });
+            return true;
+        }
+
+        // 初期構成へ戻す(⟲リセット用):増設した宇宙船を除去し、全船を待機へ。
+        public void ResetToInitial()
+        {
+            while (TransportCount > InitialTransports)
+            {
+                int idx = Ships.FindLastIndex(s => s.Type == ShipType.Transport);
+                if (idx < 0) break;
+                Ships.RemoveAt(idx);
+            }
+            foreach (var s in Ships) s.AssignedBodyNo = CelestialBody.StationNo;
         }
 
         public int TotalCount(ShipType t) => Ships.Count(s => s.Type == t);

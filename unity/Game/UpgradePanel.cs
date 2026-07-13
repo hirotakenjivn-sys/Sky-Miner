@@ -68,9 +68,58 @@ namespace SpaceMining.Game
         {
             if (_tracks == null) return;
             for (int i = _tracks.childCount - 1; i >= 0; i--) Destroy(_tracks.GetChild(i).gameObject);
-            // 採掘速度(シアンバー)/ 積載(鉱石キューブ)
-            BuildTrack(0, UiKit.Bar,  _ctrl.State.MineLevel,  lv => _ctrl.State.MineLevel = lv);
-            BuildTrack(1, UiKit.Cube, _ctrl.State.CargoLevel, lv => _ctrl.State.CargoLevel = lv);
+            // 採掘効率(1便の個数×)/ 宇宙船+1(艦隊増設)。採掘速度・積載は廃止(簡素化)。
+            BuildTrack(0, UiKit.Cube, _ctrl.State.CargoLevel, lv => _ctrl.State.CargoLevel = lv);
+            BuildShipTrack(1);
+        }
+
+        // 宇宙船の増設トラック。Lv=現在の隻数、効果=×隻数、コスト=曲線、上限で MAX。
+        void BuildShipTrack(int index)
+        {
+            var curve = _ctrl.UpgradeCurve;
+            int count = _ctrl.Fleet.TransportCount;
+            var row = UiKit.Node($"Track{index}", _tracks);
+            row.anchorMin = new Vector2(0, 1); row.anchorMax = new Vector2(1, 1); row.pivot = new Vector2(0.5f, 1f);
+            float gap = 16f;
+            row.offsetMin = new Vector2(0, -(index + 1) * (RowH + gap) + gap); row.offsetMax = new Vector2(0, -index * (RowH + gap));
+            var bg = row.gameObject.AddComponent<Image>();
+            bg.sprite = UiKit.White; bg.color = UiKit.Row; bg.raycastTarget = true;
+
+            var ic = UiKit.Icon("Icon", row, SpriteBank.Ship(ShipType.Transport, out _), UiKit.Ship);
+            UiKit.Place(ic.rectTransform, new Vector2(0, 0.5f), 20, 0, RowH * 0.42f, RowH * 0.42f, 0f);
+
+            var lvL = UiKit.Label("Cnt", row, $"×{count}", UiKit.FName, UiKit.Txt, TextAnchor.MiddleLeft, FontStyle.Bold);
+            UiKit.Place(lvL.rectTransform, new Vector2(0.24f, 0.5f), 0, 0, 220, RowH * 0.6f, 0f);
+
+            bool max = count >= Fleet.MaxTransports;
+            double cost = max ? 0 : curve.CostToNext(count).GetValueOrDefault()
+                                    * BalanceOverride.UpgradeCostScale * BalanceOverride.ShipCostMult;
+
+            if (max)
+            {
+                var maxL = UiKit.Label("Max", row, "MAX", UiKit.FNum, UiKit.Sub, TextAnchor.MiddleCenter);
+                UiKit.Span(maxL.rectTransform, 0.74f, 0.98f, 0, RowH * 0.6f);
+                return;
+            }
+
+            var coin = UiKit.Icon("Coin", row, UiKit.Coin);
+            UiKit.Place(coin.rectTransform, new Vector2(0.60f, 0.5f), 0, 0, RowH * 0.34f, RowH * 0.34f, 0f);
+            var costL = UiKit.Label("Cost", row, $"{cost:#,0}", UiKit.FNum, UiKit.Sub);
+            UiKit.Place(costL.rectTransform, new Vector2(0.60f, 0.5f), RowH * 0.34f + 8, 0, 240, RowH * 0.6f, 0f);
+
+            var btn = UiKit.Button("Buy", row, UiKit.Green);
+            UiKit.Span(btn.GetComponent<RectTransform>(), 0.80f, 0.98f, 0, RowH * 0.55f);
+            btn.interactable = _ctrl.State.Nova >= cost;
+            var up = UiKit.Label("up", btn.transform, "＋", UiKit.FName, UiKit.Dark, TextAnchor.MiddleCenter, FontStyle.Bold);
+            UiKit.Stretch(up.rectTransform);
+            double c = cost;
+            btn.onClick.AddListener(() =>
+            {
+                if (_ctrl.State.Nova < c) return;
+                if (!_ctrl.Fleet.AddTransport()) return;
+                _ctrl.State.Nova -= c;
+                Refresh();
+            });
         }
 
         void BuildTrack(int index, Sprite icon, int level, Action<int> setLevel)

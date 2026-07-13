@@ -127,23 +127,22 @@ namespace SpaceMining.Game
             var matched = _body.IsStation ? null : _ctrl.Prices.MatchBodyResources(_body.Resources);
             if (matched != null && matched.Count > 0)
             {
+                // 取れる資源は「アイコンだけ」で表示・基準単価の安い順。未解禁は灰色(item⑤)。
+                matched.Sort((a, b) => a.nova_per_kg.CompareTo(b.nova_per_kg));
+                const float sz = 72f, gap = 18f;
+                var band = UiKit.Node("Resources", _inner);
+                UiKit.TopBand(band, y, sz, 0, 0);
+                float x = 0f;
+                Color locked = new Color(0.42f, 0.44f, 0.52f, 1f);   // 未解禁=灰色ティント
                 foreach (var r in matched)
                 {
-                    double price = _ctrl.PriceOf(r.id);
-                    double ch = _ctrl.Change1d(r.id);
-                    var band = UiKit.Node($"Res_{r.id}", _inner);
-                    UiKit.TopBand(band, y, 52, 0, 0);
-                    var coin = UiKit.Icon("Coin", band, UiKit.Coin);
-                    UiKit.Place(coin.rectTransform, new Vector2(0, 0.5f), 0, 0, 40, 40, 0f);
-                    var name = UiKit.Label("Name", band, r.name_ja, UiKit.FSub, UiKit.Cyan);
-                    UiKit.Place(name.rectTransform, new Vector2(0, 0.5f), 52, 0, 300, 50, 0f);
-                    var priceL = UiKit.Label("Price", band, $"{price:#,0}", UiKit.FSub, UiKit.Cyan);
-                    UiKit.Place(priceL.rectTransform, new Vector2(0.42f, 0.5f), 0, 0, 260, 50, 0f);
-                    var chg = UiKit.Label("Chg", band, Market.ChangeText(ch), UiKit.FSub, Market.ChangeColor(ch), TextAnchor.MiddleLeft, FontStyle.Bold);
-                    UiKit.Place(chg.rectTransform, new Vector2(0.72f, 0.5f), 0, 0, 220, 50, 0f);
-                    y += 56;
+                    bool unlocked = _ctrl.IsResourceUnlocked(r.id);
+                    var icon = UiKit.Icon($"R_{r.id}", band, UiKit.Resource(r.id),
+                                          unlocked ? Color.white : locked);
+                    UiKit.Place(icon.rectTransform, new Vector2(0, 0.5f), x, 0, sz, sz, 0f);
+                    x += sz + gap;
                 }
-                return y;
+                return y + sz + 8f;
             }
             // 単価の付く資源が無ければ収入レート(数字のみ)
             if (!_body.IsStation && _body.Master != null)

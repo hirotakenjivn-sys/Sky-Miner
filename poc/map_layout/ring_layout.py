@@ -145,9 +145,12 @@ def layout(bodies=None, params: LayoutParams | None = None) -> LayoutResult:
         slots = _cluster_band(band_bodies)
         n = len(slots)
         r = radii[band]
-        # 半ピッチ千鳥(隣接リングと基準角をずらす)
         pitch = 360.0 / n if n else 0.0
-        phase = (pitch * 0.5) if (bi % 2 == 1) else 0.0
+        # バンドごとの基準角を黄金角(137.5°)で回す。天体1個のバンドが偶数=0°/奇数=180°に
+        # 揃って「直列」に見えるのを防ぎ、散らばった星図の見た目にする(半ピッチ千鳥を置換)。
+        # 画面距離=ring_radius は不変なので移動時間・予算B([[travel-time-screen-based]])に影響しない。
+        GOLDEN_DEG = 137.50776405
+        phase = (bi * GOLDEN_DEG) % 360.0
 
         for si, (primary, moons) in enumerate(slots):
             ang = phase + si * pitch

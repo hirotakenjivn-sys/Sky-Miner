@@ -66,8 +66,12 @@ namespace SpaceMining.Game
             if (d.inventory != null)
                 foreach (var it in d.inventory) c.Inventory.Add(it.id, it.name, it.kg);
             if (d.shipAssign != null)
+            {
+                // 保存時の隻数に合わせて増設(初期1隻から復元。強化で増やした船を戻す)
+                while (c.Fleet.Ships.Count < d.shipAssign.Count && c.Fleet.AddTransport()) { }
                 for (int i = 0; i < d.shipAssign.Count && i < c.Fleet.Ships.Count; i++)
                     c.Fleet.Ships[i].AssignedBodyNo = d.shipAssign[i];
+            }
             if (d.unlocked != null)
                 foreach (var no in d.unlocked) { var b = c.Data.ByNo(no); if (b != null) b.Unlocked = true; }
 

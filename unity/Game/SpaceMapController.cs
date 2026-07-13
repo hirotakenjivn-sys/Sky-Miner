@@ -300,7 +300,8 @@ namespace SpaceMining.Game
             _state.DedicatedMinerUnlocked = false; _state.AutoSellUnlocked = false;
             _state.UnlockedResources.Clear();
             _inventory.Clear();
-            foreach (var s in _fleet.Ships) s.AssignedBodyNo = CelestialBody.StationNo;
+            _fleet.ResetToInitial();      // 増設した宇宙船を初期1隻へ + 全船待機
+            _sim?.ResetShipVisuals();     // 旧マーカーを破棄(次フレームで再生成)
             foreach (var b in _data.Bodies)
                 if (!b.IsStation) b.Unlocked = b.Master != null && b.Master.unlock_price_nova == 0;
             EnsureInitialUnlock();   // 惑星の解放を戻した後に初期解禁(=月の鉄)を確定
@@ -360,8 +361,12 @@ namespace SpaceMining.Game
             var iconGo = new GameObject("icon");
             iconGo.transform.SetParent(go.transform, false);
             var sr = iconGo.AddComponent<SpriteRenderer>();
-            sr.sprite = _circle;
-            sr.color = ColorFor(b);
+            // スプライト差し替えパイプライン: PNG(art/bodies/…)があればそれ、無ければ陰影付き球。
+            // 手続き球はグレースケールなので既存の種別色(ColorFor)で tint する。PNG はフルカラーなので
+            // 白 tint(MVP対象外は減光)。色割り当てロジック自体は変更しない。
+            bool bodyIsArt;
+            sr.sprite = SpriteBank.Body(b, out bodyIsArt);
+            sr.color = BodyTint(b, bodyIsArt);
             sr.sortingOrder = b.IsMoon ? 1 : 2;
 
             var lgo = new GameObject("label");
@@ -409,6 +414,14 @@ namespace SpaceMining.Game
             sr.sortingOrder = 3;
             go.SetActive(false);
             _selRing = go.transform;
+        }
+
+        // 天体アイコンの tint。手続き球はグレースケール→種別色を乗算。PNGアートは素の色(白)、
+        // ただし MVP対象外は減光して「未開放」を保つ(既存の減光挙動を維持)。
+        Color BodyTint(CelestialBody b, bool isArt)
+        {
+            if (!isArt) return ColorFor(b);                      // 手続き球: 従来どおり種別色で着色
+            return b.IsMvp ? Color.white : new Color(0.45f, 0.47f, 0.52f, 1f);
         }
 
         Color ColorFor(CelestialBody b)
