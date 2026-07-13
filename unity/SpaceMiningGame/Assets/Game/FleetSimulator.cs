@@ -141,10 +141,13 @@ namespace SpaceMining.Game
             if (rsr.enabled != show) rsr.enabled = show;
             if (!show) return;
             rt.robotTimer += Time.deltaTime * _ctrl.State.TimeScale;
-            int f = ((int)(rt.robotTimer * RobotFps)) % frames.Length;
+            // ピンポン再生(0→末→0)。前進コマ→後退コマで正味の移動が相殺され「その場で採掘」に見える。
+            int nf = frames.Length;
+            int f = nf <= 1 ? 0 : (int)(rt.robotTimer * RobotFps) % (2 * (nf - 1));
+            if (f >= nf) f = 2 * (nf - 1) - f;
             rsr.sprite = frames[f];
             tr.position = new Vector3(spot.x, spot.y, -0.1f);
-            tr.localScale = Vector3.one * _ctrl.CurrentIconWorld * 0.7f;
+            tr.localScale = Vector3.one * _ctrl.CurrentIconWorld * 0.45f;
         }
 
         // オフライン進行:不在秒数ぶん、派遣中の各船が何便こなせたかを期待値で計算して在庫へ加算。
@@ -648,7 +651,7 @@ namespace SpaceMining.Game
             if (srr.enabled != visible) srr.enabled = visible;
             if (!visible) return;
             tr.position = new Vector3(pos.x, pos.y, 0);
-            tr.localScale = Vector3.one * _ctrl.CurrentIconWorld * 0.42f * scaleMul;
+            tr.localScale = Vector3.one * _ctrl.CurrentIconWorld * 0.85f * scaleMul;
             // 機首を原点(地球)から外向き(放射方向)へ。スプライトは +Y が機首なので、
             // 目標方向へ回す。原点付近は回さない(ゼロ除算回避)。描画のみ・移動計算には不干渉。
             if (pos.sqrMagnitude > 1e-3f)

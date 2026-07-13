@@ -122,6 +122,16 @@ namespace SpaceMining.Game
         {
             if (_png.TryGetValue(path, out var sp)) return sp;
             sp = Resources.Load<Sprite>(path);
+            if (sp == null)
+            {
+                // Texture Type=Sprite でない(=Default取込)場合でも動くよう、Texture として読んで
+                // 実行時に Sprite 化する。→ ユーザーは取込設定を変えず PNG を置くだけでよい。
+                var tex = Resources.Load<Texture2D>(path);
+                if (tex != null)
+                    // PPU=最大寸法 → native≈1ワールド単位(手続きスプライトの規約に合わせる)。
+                    sp = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height),
+                                       new Vector2(0.5f, 0.5f), Mathf.Max(tex.width, tex.height));
+            }
             _png[path] = sp;   // null もキャッシュして再探索を避ける
             return sp;
         }
@@ -152,7 +162,7 @@ namespace SpaceMining.Game
             _robotFrames = new Sprite[n];
             for (int i = 0; i < n; i++)
                 _robotFrames[i] = Sprite.Create(tex, new Rect(i * h, 0, h, h),
-                                                new Vector2(0.5f, 0.4f), h);   // 足元寄りピボット
+                                                new Vector2(0.5f, 0.08f), h);   // 足元ピボット(地面に立つ)
             return _robotFrames;
         }
 

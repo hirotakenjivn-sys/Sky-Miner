@@ -36,7 +36,7 @@ namespace SpaceMining.Game
         // アイコンは「ワールド固定サイズ」を基本にする → ズームインで惑星が大きくなる
         //(接近感)。付録A の icon_d=24px / min_dR=60px なので固定でも重ならない。
         [Tooltip("アイコンのワールド固定径[px]。ズームインでこの実サイズのまま画面上で拡大する")]
-        public float baseIconWorld = 40f;
+        public float baseIconWorld = 60f;
         [Tooltip("引ききった時に点が消えないための画面下限(orthoSize×この係数を径の下限に)")]
         public float iconMinScreenFactor = 0.02f;
         public float labelScreenFactor = 0.5f;
