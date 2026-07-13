@@ -1,0 +1,332 @@
+[
+  {
+    "id": "iron_ore",
+    "name_ja": "鉄",
+    "link_type": "daily",
+    "source": "fred",
+    "usd_per_kg": 0.105,
+    "nova_per_kg": 2761.5,
+    "indicator": "鉄鉱石62% CFR中国指数",
+    "note": "$105.14/t。基準資源。★金型:SS400・S45C等の母材"
+  },
+  {
+    "id": "coal",
+    "name_ja": "石炭",
+    "link_type": "daily",
+    "source": "fred",
+    "usd_per_kg": 0.13,
+    "nova_per_kg": 3419,
+    "indicator": "ICE Newcastle石炭先物",
+    "note": "$129.75/t。地球限定第2資源(生物由来)"
+  },
+  {
+    "id": "methane",
+    "name_ja": "メタン",
+    "link_type": "daily",
+    "source": "fred",
+    "usd_per_kg": 0.155,
+    "nova_per_kg": 4076.5,
+    "indicator": "天然ガス Henry Hub",
+    "note": "$2.95/MMBtu"
+  },
+  {
+    "id": "methane_ice",
+    "name_ja": "メタン氷",
+    "link_type": "daily",
+    "source": "derived",
+    "usd_per_kg": 0.155,
+    "nova_per_kg": 4076.5,
+    "indicator": "天然ガス Henry Hub",
+    "note": "メタンと同一指標"
+  },
+  {
+    "id": "hydrocarbon",
+    "name_ja": "炭化水素",
+    "link_type": "daily",
+    "source": "fred",
+    "usd_per_kg": 0.525,
+    "nova_per_kg": 13807.5,
+    "indicator": "WTI原油先物",
+    "note": "$71.97/bbl。タイタン限定"
+  },
+  {
+    "id": "lumber",
+    "name_ja": "木材",
+    "link_type": "daily",
+    "source": "fred",
+    "usd_per_kg": 0.55,
+    "nova_per_kg": 14465,
+    "indicator": "CME材木先物",
+    "note": "$622.5/千bf。地球限定"
+  },
+  {
+    "id": "lead",
+    "name_ja": "鉛",
+    "link_type": "daily",
+    "source": "metalsapi",
+    "usd_per_kg": 2,
+    "nova_per_kg": 52600,
+    "indicator": "LME鉛",
+    "note": "約$2,000/t"
+  },
+  {
+    "id": "chromium",
+    "name_ja": "クロム",
+    "link_type": "weekly",
+    "source": "manual",
+    "usd_per_kg": 2.8,
+    "nova_per_kg": 73640,
+    "indicator": "フェロクロム(Cr分・週次指標)",
+    "note": "概算・要確認。★金型:SKD11の13%Cr・DC53の8%Cr、硬質クロムめっき"
+  },
+  {
+    "id": "aluminum",
+    "name_ja": "アルミニウム",
+    "link_type": "daily",
+    "source": "metalsapi",
+    "usd_per_kg": 3.15,
+    "nova_per_kg": 82845,
+    "indicator": "LMEアルミニウム",
+    "note": "約$3,150/t。月の斜長石に豊富(実在)"
+  },
+  {
+    "id": "zinc",
+    "name_ja": "亜鉛",
+    "link_type": "daily",
+    "source": "metalsapi",
+    "usd_per_kg": 3.2,
+    "nova_per_kg": 84160,
+    "indicator": "LME亜鉛",
+    "note": "約$3,200/t。★金型:亜鉛合金(ZAS)試作型"
+  },
+  {
+    "id": "copper",
+    "name_ja": "銅",
+    "link_type": "daily",
+    "source": "metalsapi",
+    "usd_per_kg": 12.8,
+    "nova_per_kg": 336640,
+    "indicator": "LME銅",
+    "note": "約$12,800/t・史上高値圏。★金型:放電加工電極・端子プレス材"
+  },
+  {
+    "id": "nickel",
+    "name_ja": "ニッケル",
+    "link_type": "daily",
+    "source": "metalsapi",
+    "usd_per_kg": 16.4,
+    "nova_per_kg": 431319.9999999999,
+    "indicator": "LMEニッケル",
+    "note": "$16,400/t"
+  },
+  {
+    "id": "vanadium",
+    "name_ja": "バナジウム",
+    "link_type": "weekly",
+    "source": "manual",
+    "usd_per_kg": 30,
+    "nova_per_kg": 789000,
+    "indicator": "フェロバナジウム(V分・週次指標)",
+    "note": "概算・要確認。★金型:工具鋼の\"V\"=炭化物で耐摩耗性向上"
+  },
+  {
+    "id": "cobalt",
+    "name_ja": "コバルト",
+    "link_type": "daily",
+    "source": "metalsapi",
+    "usd_per_kg": 35,
+    "nova_per_kg": 920500,
+    "indicator": "LMEコバルト",
+    "note": "概算・要確認。★金型:超硬合金のバインダー・SKH51の\"Co\""
+  },
+  {
+    "id": "tin",
+    "name_ja": "錫",
+    "link_type": "daily",
+    "source": "metalsapi",
+    "usd_per_kg": 52,
+    "nova_per_kg": 1367600,
+    "indicator": "LME錫",
+    "note": "約$52,000/t"
+  },
+  {
+    "id": "molybdenum",
+    "name_ja": "モリブデン",
+    "link_type": "weekly",
+    "source": "manual",
+    "usd_per_kg": 55,
+    "nova_per_kg": 1446500,
+    "indicator": "酸化モリブデン(週次指標)",
+    "note": "概算・要確認。★金型:SKD11/DC53/SKH51の\"Mo\"=焼入れ性・靭性"
+  },
+  {
+    "id": "tungsten",
+    "name_ja": "タングステン",
+    "link_type": "daily",
+    "source": "manual",
+    "usd_per_kg": 177,
+    "nova_per_kg": 4655100,
+    "indicator": "SMMタングステン(中国国内)",
+    "note": "$177.37/kg(2026-06)。2025年比+550%の歴史的高騰(中国輸出規制)。★金型:超硬合金(WC)の主成分・SKH51の\"W\""
+  },
+  {
+    "id": "uranium",
+    "name_ja": "ウラン",
+    "link_type": "weekly",
+    "source": "manual",
+    "usd_per_kg": 170,
+    "nova_per_kg": 4471000,
+    "indicator": "U3O8スポット(週次公表)",
+    "note": "約$77/lb・概算要確認。月KREEP地域(推定)"
+  },
+  {
+    "id": "silver",
+    "name_ja": "銀",
+    "link_type": "daily",
+    "source": "metalsapi",
+    "usd_per_kg": 1921,
+    "nova_per_kg": 50522300,
+    "indicator": "銀スポット",
+    "note": "$59.76/toz"
+  },
+  {
+    "id": "palladium",
+    "name_ja": "パラジウム",
+    "link_type": "daily",
+    "source": "metalsapi",
+    "usd_per_kg": 41150,
+    "nova_per_kg": 1082245000,
+    "indicator": "パラジウムスポット",
+    "note": "$1,280/toz"
+  },
+  {
+    "id": "platinum",
+    "name_ja": "白金",
+    "link_type": "daily",
+    "source": "metalsapi",
+    "usd_per_kg": 52460,
+    "nova_per_kg": 1379698000,
+    "indicator": "白金スポット",
+    "note": "$1,631.8/toz"
+  },
+  {
+    "id": "gold",
+    "name_ja": "金",
+    "link_type": "daily",
+    "source": "metalsapi",
+    "usd_per_kg": 132430,
+    "nova_per_kg": 3482909000,
+    "indicator": "金スポット",
+    "note": "$4,119/toz"
+  },
+  {
+    "id": "rhodium",
+    "name_ja": "ロジウム",
+    "link_type": "daily",
+    "source": "metalsapi",
+    "usd_per_kg": 266900,
+    "nova_per_kg": 7019470000,
+    "indicator": "ロジウム(Kitco気配)",
+    "note": "$8,300/toz"
+  },
+  {
+    "id": "water",
+    "name_ja": "水",
+    "link_type": "fixed",
+    "source": "fixed",
+    "usd_per_kg": 0.001,
+    "nova_per_kg": 26.3,
+    "indicator": null,
+    "note": "素材資源(売り物ではなく研究・生命維持用)"
+  },
+  {
+    "id": "sulfur",
+    "name_ja": "硫黄",
+    "link_type": "fixed",
+    "source": "fixed",
+    "usd_per_kg": 0.15,
+    "nova_per_kg": 3945,
+    "indicator": null,
+    "note": "素材資源。水星(高濃度・実在)・イオ"
+  },
+  {
+    "id": "nitrogen_ice",
+    "name_ja": "窒素氷",
+    "link_type": "fixed",
+    "source": "fixed",
+    "usd_per_kg": 0.2,
+    "nova_per_kg": 5260,
+    "indicator": null,
+    "note": "素材資源"
+  },
+  {
+    "id": "carbonaceous",
+    "name_ja": "炭素質(水・有機物)",
+    "link_type": "fixed",
+    "source": "fixed",
+    "usd_per_kg": 0.4,
+    "nova_per_kg": 10520,
+    "indicator": null,
+    "note": "素材資源(ゲーム用設定)"
+  },
+  {
+    "id": "ammonia",
+    "name_ja": "アンモニア",
+    "link_type": "fixed",
+    "source": "fixed",
+    "usd_per_kg": 0.5,
+    "nova_per_kg": 13150,
+    "indicator": null,
+    "note": "素材資源"
+  },
+  {
+    "id": "hydrogen",
+    "name_ja": "水素",
+    "link_type": "fixed",
+    "source": "fixed",
+    "usd_per_kg": 4,
+    "nova_per_kg": 105200,
+    "indicator": null,
+    "note": "素材資源(推進剤)"
+  },
+  {
+    "id": "titanium",
+    "name_ja": "チタン",
+    "link_type": "fixed",
+    "source": "fixed",
+    "usd_per_kg": 9,
+    "nova_per_kg": 236700,
+    "indicator": "―(四半期見直し)",
+    "note": "★金型ではないが構造材の定番。収入資源"
+  },
+  {
+    "id": "helium",
+    "name_ja": "ヘリウム",
+    "link_type": "fixed",
+    "source": "fixed",
+    "usd_per_kg": 60,
+    "nova_per_kg": 1578000,
+    "indicator": null,
+    "note": null
+  },
+  {
+    "id": "helium3",
+    "name_ja": "ヘリウム3",
+    "link_type": "fixed",
+    "source": "fixed",
+    "usd_per_kg": null,
+    "nova_per_kg": 100000000000,
+    "indicator": null,
+    "note": "外縁バンドの収入アンカー(天王星・海王星が現実の採取構想の本命)"
+  },
+  {
+    "id": "exotic_matter",
+    "name_ja": "希少物質",
+    "link_type": "fixed",
+    "source": "fixed",
+    "usd_per_kg": null,
+    "nova_per_kg": 500000000000,
+    "indicator": null,
+    "note": "ゲーム用設定・最上位(架空)"
+  }
+]

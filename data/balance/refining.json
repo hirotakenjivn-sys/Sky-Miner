@@ -1,0 +1,63 @@
+{
+  "params": {
+    "ore_grade_coeff_std": 0.35,
+    "recovery_lv1": 0.7,
+    "capacity_lv1_kg_h": 500
+  },
+  "recipes": [
+    {
+      "product_ja": "鋼(スチール)",
+      "recipe": "鉄1.0+石炭0.5(コークス)",
+      "component_cost_nova_kg": 4471,
+      "craft_premium": 5,
+      "sale_price_nova_kg": 22355,
+      "reference": "熱延コイル 約$0.85/kg",
+      "die_note": "SS400・S45C等の母材。製鉄に石炭=地球の石炭に用途"
+    },
+    {
+      "product_ja": "ステンレス鋼",
+      "recipe": "鋼0.72+クロム0.18+ニッケル0.10",
+      "component_cost_nova_kg": 59606.32,
+      "craft_premium": 1.1,
+      "sale_price_nova_kg": 65566.952,
+      "reference": "SUS304 約$3/kg",
+      "die_note": null
+    },
+    {
+      "product_ja": "合金工具鋼(ダイス鋼)",
+      "recipe": "鋼0.85+クロム0.12+モリブデン0.01+バナジウム0.005",
+      "component_cost_nova_kg": 31047.15,
+      "craft_premium": 5.5,
+      "sale_price_nova_kg": 170759.325,
+      "reference": "SKD11相当 約$10/kg",
+      "die_note": "★SKD11の組成そのもの(13%Cr系)"
+    },
+    {
+      "product_ja": "高速度鋼(ハイス)",
+      "recipe": "鋼0.8+W0.06+Mo0.05+Cr0.04+V0.02+Co0.05",
+      "component_cost_nova_kg": 419958.4,
+      "craft_premium": 1.8,
+      "sale_price_nova_kg": 755925.12,
+      "reference": "SKH51相当 約$30/kg",
+      "die_note": "★SKH51の組成そのもの"
+    },
+    {
+      "product_ja": "超硬合金",
+      "recipe": "タングステン0.85+コバルト0.10+炭素0.05",
+      "component_cost_nova_kg": 4049055.95,
+      "craft_premium": 1.5,
+      "sale_price_nova_kg": 6073583.925000001,
+      "reference": "超硬素材 $200〜300/kg",
+      "die_note": "★WC+Co。タングステン高騰が超硬価格に直結する現実の構図が数式に"
+    },
+    {
+      "product_ja": "青銅",
+      "recipe": "銅0.88+錫0.12",
+      "component_cost_nova_kg": 460355.2,
+      "craft_premium": 1.2,
+      "sale_price_nova_kg": 552426.24,
+      "reference": "砲金系 約$15/kg",
+      "die_note": null
+    }
+  ]
+}

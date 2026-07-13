@@ -1,0 +1,3 @@
+Flask>=3.0
+cryptography>=42
+# 標準ライブラリで FRED 取得・メール送信を行うため requests は必須ではない

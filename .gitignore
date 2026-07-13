@@ -1,0 +1,44 @@
+# 生成物・秘密情報(gitignore は行末コメント非対応 → コメントは行頭に置く)
+# xlsx 再計算スナップショット
+build/
+# SQLite DB(生成物)
+server/data/
+# 生成 JSON(配信物)
+server/dist/
+# Ed25519 秘密鍵(公開鍵 public_key.txt もここ)
+server/keys/
+# 実設定(APIキー・SMTP 認証情報)
+server/config.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+
+# Unity(自動生成物。Assets/ProjectSettings/Packages のみ管理)
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Uu]serSettings/
+[Mm]emoryCaptures/
+[Bb]uild[s]/
+.vs/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+# Unity のバッチ実行ログ(このリポジトリ固有)
+unity/*.log

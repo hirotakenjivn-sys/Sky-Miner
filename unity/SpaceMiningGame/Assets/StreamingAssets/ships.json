@@ -1,0 +1,7 @@
+{
+  "miner_mining_rate_kg_s": 3,
+  "miner_capacity_kg": 180,
+  "transport_capacity_kg": 500,
+  "load_unload_sec": 120,
+  "build_cost_v_frontier_sec": 1800
+}

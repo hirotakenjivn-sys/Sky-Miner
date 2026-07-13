@@ -1,0 +1,27 @@
+{
+  "base_date": "2026-07-11",
+  "base_usd_vnd": 26300,
+  "clamp_daily": 0.10,
+  "clamp_total": 0.50,
+  "validate_threshold": 0.30,
+
+  "fred_api_key": "",
+
+  "smtp": {
+    "enabled": false,
+    "host": "smtp.gmail.com",
+    "port": 587,
+    "user": "",
+    "password": "",
+    "from": "market-bot@example.com",
+    "to": ["hirotakenjivn@gmail.com"]
+  },
+
+  "healthcheck_ping_url": "",
+
+  "_note": [
+    "config.json を config.example.json からコピーして値を埋める(config.json は gitignore)。",
+    "fred_api_key は https://fred.stlouisfed.org/docs/api/api_key.html で無料取得。",
+    "smtp.enabled=false のあいだメール通知はコンソール出力にフォールバックする。"
+  ]
+}

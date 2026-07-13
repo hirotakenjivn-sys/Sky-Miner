@@ -1,0 +1,730 @@
+[
+  {
+    "day": 0,
+    "bodies_unlocked": 1,
+    "income_rate": 6903.75,
+    "cumulative_earned": 207112500,
+    "cumulative_unlock_cost": 0,
+    "sufficiency": null
+  },
+  {
+    "day": 1,
+    "bodies_unlocked": 4,
+    "income_rate": 15878.40408,
+    "cumulative_earned": 683464622.4000001,
+    "cumulative_unlock_cost": 151937800,
+    "sufficiency": 2.24915926912197
+  },
+  {
+    "day": 2,
+    "bodies_unlocked": 6,
+    "income_rate": 27666.53126899201,
+    "cumulative_earned": 1513460560.46976,
+    "cumulative_unlock_cost": 428222000,
+    "sufficiency": 1.767144799274396
+  },
+  {
+    "day": 3,
+    "bodies_unlocked": 8,
+    "income_rate": 48206.16408309168,
+    "cumulative_earned": 2959645482.962511,
+    "cumulative_unlock_cost": 909619700,
+    "sufficiency": 1.626858720717302
+  },
+  {
+    "day": 4,
+    "bodies_unlocked": 10,
+    "income_rate": 83994.42029837894,
+    "cumulative_earned": 5479478091.913879,
+    "cumulative_unlock_cost": 1748406900,
+    "sufficiency": 1.566991668791138
+  },
+  {
+    "day": 5,
+    "bodies_unlocked": 11,
+    "income_rate": 110872.6347938602,
+    "cumulative_earned": 8805657135.729687,
+    "cumulative_unlock_cost": 3008323200,
+    "sufficiency": 1.463549052131381
+  },
+  {
+    "day": 6,
+    "bodies_unlocked": 12,
+    "income_rate": 146351.8779278955,
+    "cumulative_earned": 13196213473.56655,
+    "cumulative_unlock_cost": 4338794800,
+    "sufficiency": 1.520723390002974
+  },
+  {
+    "day": 7,
+    "bodies_unlocked": 13,
+    "income_rate": 193184.4788648221,
+    "cumulative_earned": 18991747839.51122,
+    "cumulative_unlock_cost": 6095017300,
+    "sufficiency": 1.557973251323767
+  },
+  {
+    "day": 8,
+    "bodies_unlocked": 14,
+    "income_rate": 255003.5121015651,
+    "cumulative_earned": 26641853202.55817,
+    "cumulative_unlock_cost": 8413231000,
+    "sufficiency": 1.583330661107378
+  },
+  {
+    "day": 9,
+    "bodies_unlocked": 16,
+    "income_rate": 444318.1194857671,
+    "cumulative_earned": 39971396787.13118,
+    "cumulative_unlock_cost": 15512528700,
+    "sufficiency": 1.288358512017811
+  },
+  {
+    "day": 10,
+    "bodies_unlocked": 17,
+    "income_rate": 586499.9177212126,
+    "cumulative_earned": 57566394318.76756,
+    "cumulative_unlock_cost": 22177300500,
+    "sufficiency": 1.297867482085287
+  },
+  {
+    "day": 11,
+    "bodies_unlocked": 18,
+    "income_rate": 774179.8913920007,
+    "cumulative_earned": 80791791060.52759,
+    "cumulative_unlock_cost": 30974799300,
+    "sufficiency": 1.304153584306317
+  },
+  {
+    "day": 12,
+    "bodies_unlocked": 19,
+    "income_rate": 1021917.456637441,
+    "cumulative_earned": 111449314759.6508,
+    "cumulative_unlock_cost": 42587497700,
+    "sufficiency": 1.308474561533711
+  },
+  {
+    "day": 13,
+    "bodies_unlocked": 20,
+    "income_rate": 1348931.042761422,
+    "cumulative_earned": 151917246042.4935,
+    "cumulative_unlock_cost": 57916259500,
+    "sufficiency": 1.311525013476513
+  },
+  {
+    "day": 14,
+    "bodies_unlocked": 21,
+    "income_rate": 1780588.976445077,
+    "cumulative_earned": 205334915335.8458,
+    "cumulative_unlock_cost": 78150225100,
+    "sufficiency": 1.313719282785827
+  },
+  {
+    "day": 15,
+    "bodies_unlocked": 22,
+    "income_rate": 2350377.448907502,
+    "cumulative_earned": 275846238803.0709,
+    "cumulative_unlock_cost": 104859059700,
+    "sufficiency": 1.315319055846306
+  },
+  {
+    "day": 16,
+    "bodies_unlocked": 22,
+    "income_rate": 2350377.448907502,
+    "cumulative_earned": 346357562270.2959,
+    "cumulative_unlock_cost": 104859059700,
+    "sufficiency": 1.651538566439653
+  },
+  {
+    "day": 17,
+    "bodies_unlocked": 23,
+    "income_rate": 3102498.232557903,
+    "cumulative_earned": 439432509247.033,
+    "cumulative_unlock_cost": 147165853800,
+    "sufficiency": 1.492983929017347
+  },
+  {
+    "day": 18,
+    "bodies_unlocked": 24,
+    "income_rate": 4095297.666976432,
+    "cumulative_earned": 562291439256.3259,
+    "cumulative_unlock_cost": 203010822000,
+    "sufficiency": 1.384880455427952
+  },
+  {
+    "day": 19,
+    "bodies_unlocked": 25,
+    "income_rate": 5405792.920408891,
+    "cumulative_earned": 724465226868.5927,
+    "cumulative_unlock_cost": 276726180000,
+    "sufficiency": 1.308992930969872
+  },
+  {
+    "day": 20,
+    "bodies_unlocked": 26,
+    "income_rate": 7135646.654939736,
+    "cumulative_earned": 938534626516.7847,
+    "cumulative_unlock_cost": 374030452600,
+    "sufficiency": 1.254623279993305
+  },
+  {
+    "day": 21,
+    "bodies_unlocked": 27,
+    "income_rate": 9419053.584520452,
+    "cumulative_earned": 1221106234052.398,
+    "cumulative_unlock_cost": 502472092400,
+    "sufficiency": 1.215098562210615
+  },
+  {
+    "day": 22,
+    "bodies_unlocked": 27,
+    "income_rate": 9419053.584520452,
+    "cumulative_earned": 1503677841588.012,
+    "cumulative_unlock_cost": 502472092400,
+    "sufficiency": 1.496279956968225
+  },
+  {
+    "day": 23,
+    "bodies_unlocked": 28,
+    "income_rate": 12433150.731567,
+    "cumulative_earned": 1876672363535.021,
+    "cumulative_unlock_cost": 714400798100,
+    "sufficiency": 1.313459033448847
+  },
+  {
+    "day": 24,
+    "bodies_unlocked": 29,
+    "income_rate": 16411758.96566844,
+    "cumulative_earned": 2369025132505.075,
+    "cumulative_unlock_cost": 994146689600,
+    "sufficiency": 1.191486707790711
+  },
+  {
+    "day": 25,
+    "bodies_unlocked": 29,
+    "income_rate": 16411758.96566844,
+    "cumulative_earned": 2861377901475.128,
+    "cumulative_unlock_cost": 994146689600,
+    "sufficiency": 1.439112523035417
+  },
+  {
+    "day": 26,
+    "bodies_unlocked": 30,
+    "income_rate": 21663521.83468234,
+    "cumulative_earned": 3511283556515.598,
+    "cumulative_unlock_cost": 1363411266300,
+    "sufficiency": 1.287683197031389
+  },
+  {
+    "day": 27,
+    "bodies_unlocked": 31,
+    "income_rate": 28595848.82178069,
+    "cumulative_earned": 4369159021169.019,
+    "cumulative_unlock_cost": 1850840507600,
+    "sufficiency": 1.18031753768847
+  },
+  {
+    "day": 28,
+    "bodies_unlocked": 31,
+    "income_rate": 28595848.82178069,
+    "cumulative_earned": 5227034485822.439,
+    "cumulative_unlock_cost": 1850840507600,
+    "sufficiency": 1.412070479427851
+  },
+  {
+    "day": 29,
+    "bodies_unlocked": 32,
+    "income_rate": 37746520.44475051,
+    "cumulative_earned": 6359430099164.955,
+    "cumulative_unlock_cost": 2494247106100,
+    "sufficiency": 1.274819580548406
+  },
+  {
+    "day": 30,
+    "bodies_unlocked": 33,
+    "income_rate": 49825406.98707067,
+    "cumulative_earned": 7854192308777.075,
+    "cumulative_unlock_cost": 3343543816100,
+    "sufficiency": 1.174531087488247
+  },
+  {
+    "day": 31,
+    "bodies_unlocked": 33,
+    "income_rate": 49825406.98707067,
+    "cumulative_earned": 9348954518389.195,
+    "cumulative_unlock_cost": 3343543816100,
+    "sufficiency": 1.398060715306263
+  },
+  {
+    "day": 32,
+    "bodies_unlocked": 34,
+    "income_rate": 65769537.22293329,
+    "cumulative_earned": 11322040635077.19,
+    "cumulative_unlock_cost": 4838306025700,
+    "sufficiency": 1.170041805431182
+  },
+  {
+    "day": 33,
+    "bodies_unlocked": 34,
+    "income_rate": 65769537.22293329,
+    "cumulative_earned": 13295126751765.19,
+    "cumulative_unlock_cost": 4838306025700,
+    "sufficiency": 1.373944380651456
+  },
+  {
+    "day": 34,
+    "bodies_unlocked": 35,
+    "income_rate": 86815789.13427195,
+    "cumulative_earned": 15899600425793.35,
+    "cumulative_unlock_cost": 6811392142400,
+    "sufficiency": 1.167132951193668
+  },
+  {
+    "day": 35,
+    "bodies_unlocked": 35,
+    "income_rate": 86815789.13427195,
+    "cumulative_earned": 18504074099821.51,
+    "cumulative_unlock_cost": 6811392142400,
+    "sufficiency": 1.358318073087889
+  },
+  {
+    "day": 36,
+    "bodies_unlocked": 36,
+    "income_rate": 114596841.657239,
+    "cumulative_earned": 21941979349538.68,
+    "cumulative_unlock_cost": 9415865816400,
+    "sufficiency": 1.165159942664085
+  },
+  {
+    "day": 37,
+    "bodies_unlocked": 36,
+    "income_rate": 114596841.657239,
+    "cumulative_earned": 25379884599255.84,
+    "cumulative_unlock_cost": 9415865816400,
+    "sufficiency": 1.347719110177349
+  },
+  {
+    "day": 38,
+    "bodies_unlocked": 37,
+    "income_rate": 151267830.9875555,
+    "cumulative_earned": 29917919528882.51,
+    "cumulative_unlock_cost": 12853771066100,
+    "sufficiency": 1.16377985009344
+  },
+  {
+    "day": 39,
+    "bodies_unlocked": 37,
+    "income_rate": 151267830.9875555,
+    "cumulative_earned": 34455954458509.17,
+    "cumulative_unlock_cost": 12853771066100,
+    "sufficiency": 1.340305280112771
+  },
+  {
+    "day": 40,
+    "bodies_unlocked": 38,
+    "income_rate": 199673536.9035732,
+    "cumulative_earned": 40446160565616.37,
+    "cumulative_unlock_cost": 17391805995700,
+    "sufficiency": 1.162793575768278
+  },
+  {
+    "day": 41,
+    "bodies_unlocked": 38,
+    "income_rate": 199673536.9035732,
+    "cumulative_earned": 46436366672723.56,
+    "cumulative_unlock_cost": 17391805995700,
+    "sufficiency": 1.33500703389299
+  },
+  {
+    "day": 42,
+    "bodies_unlocked": 39,
+    "income_rate": 263569068.7127167,
+    "cumulative_earned": 54343438734105.06,
+    "cumulative_unlock_cost": 23382012102800,
+    "sufficiency": 1.162077893364819
+  },
+  {
+    "day": 43,
+    "bodies_unlocked": 39,
+    "income_rate": 263569068.7127167,
+    "cumulative_earned": 62250510795486.56,
+    "cumulative_unlock_cost": 23382012102800,
+    "sufficiency": 1.331162402144853
+  },
+  {
+    "day": 44,
+    "bodies_unlocked": 40,
+    "income_rate": 347911170.700786,
+    "cumulative_earned": 72687845916510.14,
+    "cumulative_unlock_cost": 31289084164200,
+    "sufficiency": 1.161552788427047
+  },
+  {
+    "day": 45,
+    "bodies_unlocked": 40,
+    "income_rate": 347911170.700786,
+    "cumulative_earned": 83125181037533.72,
+    "cumulative_unlock_cost": 31289084164200,
+    "sufficiency": 1.328341548785934
+  },
+  {
+    "day": 46,
+    "bodies_unlocked": 40,
+    "income_rate": 347911170.700786,
+    "cumulative_earned": 93562516158557.3,
+    "cumulative_unlock_cost": 31289084164200,
+    "sufficiency": 1.49513030914482
+  },
+  {
+    "day": 47,
+    "bodies_unlocked": 41,
+    "income_rate": 459242745.3250375,
+    "cumulative_earned": 107339798518308.4,
+    "cumulative_unlock_cost": 44335753065500,
+    "sufficiency": 1.210533159995372
+  },
+  {
+    "day": 48,
+    "bodies_unlocked": 41,
+    "income_rate": 459242745.3250375,
+    "cumulative_earned": 121117080878059.5,
+    "cumulative_unlock_cost": 44335753065500,
+    "sufficiency": 1.365907563351023
+  },
+  {
+    "day": 49,
+    "bodies_unlocked": 42,
+    "income_rate": 606200423.8290496,
+    "cumulative_earned": 139303093592931,
+    "cumulative_unlock_cost": 61557356015200,
+    "sufficiency": 1.131490228060914
+  },
+  {
+    "day": 50,
+    "bodies_unlocked": 42,
+    "income_rate": 606200423.8290496,
+    "cumulative_earned": 157489106307802.5,
+    "cumulative_unlock_cost": 61557356015200,
+    "sufficiency": 1.279206227350917
+  },
+  {
+    "day": 51,
+    "bodies_unlocked": 42,
+    "income_rate": 606200423.8290496,
+    "cumulative_earned": 175675119022674,
+    "cumulative_unlock_cost": 61557356015200,
+    "sufficiency": 1.42692222664092
+  },
+  {
+    "day": 52,
+    "bodies_unlocked": 43,
+    "income_rate": 800184559.4543456,
+    "cumulative_earned": 199680655806304.4,
+    "cumulative_unlock_cost": 88836375087500,
+    "sufficiency": 1.12386764773792
+  },
+  {
+    "day": 53,
+    "bodies_unlocked": 43,
+    "income_rate": 800184559.4543456,
+    "cumulative_earned": 223686192589934.8,
+    "cumulative_unlock_cost": 88836375087500,
+    "sufficiency": 1.25897861303781
+  },
+  {
+    "day": 54,
+    "bodies_unlocked": 43,
+    "income_rate": 800184559.4543456,
+    "cumulative_earned": 247691729373565.2,
+    "cumulative_unlock_cost": 88836375087500,
+    "sufficiency": 1.394089578337699
+  },
+  {
+    "day": 55,
+    "bodies_unlocked": 43,
+    "income_rate": 800184559.4543456,
+    "cumulative_earned": 271697266157195.5,
+    "cumulative_unlock_cost": 88836375087500,
+    "sufficiency": 1.529200543637589
+  },
+  {
+    "day": 56,
+    "bodies_unlocked": 44,
+    "income_rate": 1056243618.479736,
+    "cumulative_earned": 303384574711587.6,
+    "cumulative_unlock_cost": 136847448654800,
+    "sufficiency": 1.108477277778413
+  },
+  {
+    "day": 57,
+    "bodies_unlocked": 44,
+    "income_rate": 1056243618.479736,
+    "cumulative_earned": 335071883265979.7,
+    "cumulative_unlock_cost": 136847448654800,
+    "sufficiency": 1.224253307459185
+  },
+  {
+    "day": 58,
+    "bodies_unlocked": 44,
+    "income_rate": 1056243618.479736,
+    "cumulative_earned": 366759191820371.8,
+    "cumulative_unlock_cost": 136847448654800,
+    "sufficiency": 1.340029337139957
+  },
+  {
+    "day": 59,
+    "bodies_unlocked": 44,
+    "income_rate": 1056243618.479736,
+    "cumulative_earned": 398446500374763.8,
+    "cumulative_unlock_cost": 136847448654800,
+    "sufficiency": 1.455805366820728
+  },
+  {
+    "day": 60,
+    "bodies_unlocked": 45,
+    "income_rate": 1394241576.393252,
+    "cumulative_earned": 440273747666561.4,
+    "cumulative_unlock_cost": 200222065763600,
+    "sufficiency": 1.099463603043602
+  },
+  {
+    "day": 61,
+    "bodies_unlocked": 45,
+    "income_rate": 1394241576.393252,
+    "cumulative_earned": 482100994958358.9,
+    "cumulative_unlock_cost": 200222065763600,
+    "sufficiency": 1.203915745049725
+  },
+  {
+    "day": 62,
+    "bodies_unlocked": 45,
+    "income_rate": 1394241576.393252,
+    "cumulative_earned": 523928242250156.5,
+    "cumulative_unlock_cost": 200222065763600,
+    "sufficiency": 1.308367887055847
+  },
+  {
+    "day": 63,
+    "bodies_unlocked": 45,
+    "income_rate": 1394241576.393252,
+    "cumulative_earned": 565755489541954,
+    "cumulative_unlock_cost": 200222065763600,
+    "sufficiency": 1.41282002906197
+  },
+  {
+    "day": 64,
+    "bodies_unlocked": 45,
+    "income_rate": 1394241576.393252,
+    "cumulative_earned": 607582736833751.5,
+    "cumulative_unlock_cost": 200222065763600,
+    "sufficiency": 1.517272171068092
+  },
+  {
+    "day": 65,
+    "bodies_unlocked": 46,
+    "income_rate": 1840398880.839092,
+    "cumulative_earned": 662794703258924.2,
+    "cumulative_unlock_cost": 304790183993100,
+    "sufficiency": 1.087296668441804
+  },
+  {
+    "day": 66,
+    "bodies_unlocked": 46,
+    "income_rate": 1840398880.839092,
+    "cumulative_earned": 718006669684097,
+    "cumulative_unlock_cost": 304790183993100,
+    "sufficiency": 1.177870396410718
+  },
+  {
+    "day": 67,
+    "bodies_unlocked": 46,
+    "income_rate": 1840398880.839092,
+    "cumulative_earned": 773218636109269.8,
+    "cumulative_unlock_cost": 304790183993100,
+    "sufficiency": 1.268444124379633
+  },
+  {
+    "day": 68,
+    "bodies_unlocked": 46,
+    "income_rate": 1840398880.839092,
+    "cumulative_earned": 828430602534442.5,
+    "cumulative_unlock_cost": 304790183993100,
+    "sufficiency": 1.359017852348547
+  },
+  {
+    "day": 69,
+    "bodies_unlocked": 46,
+    "income_rate": 1840398880.839092,
+    "cumulative_earned": 883642568959615.2,
+    "cumulative_unlock_cost": 304790183993100,
+    "sufficiency": 1.449591580317461
+  },
+  {
+    "day": 70,
+    "bodies_unlocked": 47,
+    "income_rate": 2429326522.707602,
+    "cumulative_earned": 956522364640843.2,
+    "cumulative_unlock_cost": 442820100056000,
+    "sufficiency": 1.080034944800247
+  },
+  {
+    "day": 71,
+    "bodies_unlocked": 47,
+    "income_rate": 2429326522.707602,
+    "cumulative_earned": 1029402160322071,
+    "cumulative_unlock_cost": 442820100056000,
+    "sufficiency": 1.162325468279207
+  },
+  {
+    "day": 72,
+    "bodies_unlocked": 47,
+    "income_rate": 2429326522.707602,
+    "cumulative_earned": 1102281956003299,
+    "cumulative_unlock_cost": 442820100056000,
+    "sufficiency": 1.244615991758168
+  },
+  {
+    "day": 73,
+    "bodies_unlocked": 47,
+    "income_rate": 2429326522.707602,
+    "cumulative_earned": 1175161751684527,
+    "cumulative_unlock_cost": 442820100056000,
+    "sufficiency": 1.326906515237129
+  },
+  {
+    "day": 74,
+    "bodies_unlocked": 47,
+    "income_rate": 2429326522.707602,
+    "cumulative_earned": 1248041547365755,
+    "cumulative_unlock_cost": 442820100056000,
+    "sufficiency": 1.409197038716089
+  },
+  {
+    "day": 75,
+    "bodies_unlocked": 47,
+    "income_rate": 2429326522.707602,
+    "cumulative_earned": 1320921343046983,
+    "cumulative_unlock_cost": 442820100056000,
+    "sufficiency": 1.49148756219505
+  },
+  {
+    "day": 76,
+    "bodies_unlocked": 48,
+    "income_rate": 3206711009.974035,
+    "cumulative_earned": 1417122673346204,
+    "cumulative_unlock_cost": 661459487099700,
+    "sufficiency": 1.071208971209907
+  },
+  {
+    "day": 77,
+    "bodies_unlocked": 48,
+    "income_rate": 3206711009.974035,
+    "cumulative_earned": 1513324003645425,
+    "cumulative_unlock_cost": 661459487099700,
+    "sufficiency": 1.143927960184602
+  },
+  {
+    "day": 78,
+    "bodies_unlocked": 48,
+    "income_rate": 3206711009.974035,
+    "cumulative_earned": 1609525333944646,
+    "cumulative_unlock_cost": 661459487099700,
+    "sufficiency": 1.216646949159297
+  },
+  {
+    "day": 79,
+    "bodies_unlocked": 48,
+    "income_rate": 3206711009.974035,
+    "cumulative_earned": 1705726664243867,
+    "cumulative_unlock_cost": 661459487099700,
+    "sufficiency": 1.289365938133992
+  },
+  {
+    "day": 80,
+    "bodies_unlocked": 48,
+    "income_rate": 3206711009.974035,
+    "cumulative_earned": 1801927994543088,
+    "cumulative_unlock_cost": 661459487099700,
+    "sufficiency": 1.362084927108687
+  },
+  {
+    "day": 81,
+    "bodies_unlocked": 48,
+    "income_rate": 3206711009.974035,
+    "cumulative_earned": 1898129324842309,
+    "cumulative_unlock_cost": 661459487099700,
+    "sufficiency": 1.434803916083382
+  },
+  {
+    "day": 82,
+    "bodies_unlocked": 49,
+    "income_rate": 4232858533.165727,
+    "cumulative_earned": 2025115080837281,
+    "cumulative_unlock_cost": 950063477997400,
+    "sufficiency": 1.065778828329418
+  },
+  {
+    "day": 83,
+    "bodies_unlocked": 49,
+    "income_rate": 4232858533.165727,
+    "cumulative_earned": 2152100836832253,
+    "cumulative_unlock_cost": 950063477997400,
+    "sufficiency": 1.132608971228206
+  },
+  {
+    "day": 84,
+    "bodies_unlocked": 49,
+    "income_rate": 4232858533.165727,
+    "cumulative_earned": 2279086592827224,
+    "cumulative_unlock_cost": 950063477997400,
+    "sufficiency": 1.199439114126994
+  },
+  {
+    "day": 85,
+    "bodies_unlocked": 49,
+    "income_rate": 4232858533.165727,
+    "cumulative_earned": 2406072348822196,
+    "cumulative_unlock_cost": 950063477997400,
+    "sufficiency": 1.266269257025782
+  },
+  {
+    "day": 86,
+    "bodies_unlocked": 49,
+    "income_rate": 4232858533.165727,
+    "cumulative_earned": 2533058104817168,
+    "cumulative_unlock_cost": 950063477997400,
+    "sufficiency": 1.33309939992457
+  },
+  {
+    "day": 87,
+    "bodies_unlocked": 49,
+    "income_rate": 4232858533.165727,
+    "cumulative_earned": 2660043860812140,
+    "cumulative_unlock_cost": 950063477997400,
+    "sufficiency": 1.399929542823359
+  },
+  {
+    "day": 88,
+    "bodies_unlocked": 49,
+    "income_rate": 4232858533.165727,
+    "cumulative_earned": 2787029616807112,
+    "cumulative_unlock_cost": 950063477997400,
+    "sufficiency": 1.466759685722147
+  },
+  {
+    "day": 89,
+    "bodies_unlocked": 49,
+    "income_rate": 4232858533.165727,
+    "cumulative_earned": 2914015372802084,
+    "cumulative_unlock_cost": 950063477997400,
+    "sufficiency": 1.533589828620935
+  },
+  {
+    "day": 90,
+    "bodies_unlocked": 50,
+    "income_rate": 5587373263.778758,
+    "cumulative_earned": 3081636570715447,
+    "cumulative_unlock_cost": 1458006501977300,
+    "sufficiency": 1.056797952044876
+  }
+]

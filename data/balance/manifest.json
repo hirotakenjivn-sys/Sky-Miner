@@ -1,0 +1,15 @@
+{
+  "source": "docs/credit_economy_model.xlsx",
+  "recalc_engine": "formulas ライブラリ",
+  "base_date": "2026-07-11",
+  "usd_vnd_rate": 26300,
+  "files": {
+    "params.json": "基準パラメータ(v0/r/α/s/E/為替/クランプ基準)",
+    "resources.json": "資源マスタ 33 種(id・連動区分・NOVA単価)",
+    "bodies.json": "天体マスタ 50 体(距離・収入・アンロック価格・片道)",
+    "speed_curve.json": "統一速度カーブ 10 バンド",
+    "upgrade_curve.json": "強化コスト曲線 50 Lv",
+    "refining.json": "精錬・加工 6 レシピ",
+    "progression.json": "進行シミュレーション(充足率)"
+  }
+}

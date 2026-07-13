@@ -1,0 +1,82 @@
+[
+  {
+    "band": "B1",
+    "rep_distance_km": 380000,
+    "target_oneway_min": 1,
+    "required_speed_km_min": 380000,
+    "ratio_vs_prev": null,
+    "arrival_day": 0
+  },
+  {
+    "band": "B2",
+    "rep_distance_km": 25000000,
+    "target_oneway_min": 5,
+    "required_speed_km_min": 5000000,
+    "ratio_vs_prev": 13.1578947368421,
+    "arrival_day": 0.2
+  },
+  {
+    "band": "B3",
+    "rep_distance_km": 77000000,
+    "target_oneway_min": 10,
+    "required_speed_km_min": 7700000,
+    "ratio_vs_prev": 1.54,
+    "arrival_day": 2
+  },
+  {
+    "band": "B4",
+    "rep_distance_km": 78200000,
+    "target_oneway_min": 10,
+    "required_speed_km_min": 7820000,
+    "ratio_vs_prev": 1.015584415584416,
+    "arrival_day": 3
+  },
+  {
+    "band": "B5",
+    "rep_distance_km": 370000000,
+    "target_oneway_min": 12,
+    "required_speed_km_min": 30833333.33333333,
+    "ratio_vs_prev": 3.942881500426257,
+    "arrival_day": 5
+  },
+  {
+    "band": "B6",
+    "rep_distance_km": 634000000,
+    "target_oneway_min": 13,
+    "required_speed_km_min": 48769230.76923077,
+    "ratio_vs_prev": 1.581704781704782,
+    "arrival_day": 10
+  },
+  {
+    "band": "B7",
+    "rep_distance_km": 1287000000,
+    "target_oneway_min": 20,
+    "required_speed_km_min": 64350000,
+    "ratio_vs_prev": 1.319479495268139,
+    "arrival_day": 15
+  },
+  {
+    "band": "B8",
+    "rep_distance_km": 2705000000,
+    "target_oneway_min": 30,
+    "required_speed_km_min": 90166666.66666667,
+    "ratio_vs_prev": 1.401191401191401,
+    "arrival_day": 25.5
+  },
+  {
+    "band": "B9",
+    "rep_distance_km": 4353000000,
+    "target_oneway_min": 45,
+    "required_speed_km_min": 96733333.33333333,
+    "ratio_vs_prev": 1.072828096118299,
+    "arrival_day": 36
+  },
+  {
+    "band": "B10",
+    "rep_distance_km": 13000000000,
+    "target_oneway_min": 120,
+    "required_speed_km_min": 108333333.3333333,
+    "ratio_vs_prev": 1.119917298414886,
+    "arrival_day": 44
+  }
+]
