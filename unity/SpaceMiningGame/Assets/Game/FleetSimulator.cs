@@ -480,8 +480,13 @@ namespace SpaceMining.Game
                     break;
             }
             rt.worldPos = p; rt.visible = true;
+            // 機首を進行方向へ。往路=惑星へ / 着地(採掘)=そこから90°反時計回り / 帰路=180°(地球へ)。
+            float faceOut = Mathf.Atan2(spot.y, spot.x) * Mathf.Rad2Deg - 90f;
+            float facing = rt.phase == Phase.Mining ? faceOut + 90f
+                         : rt.phase == Phase.Return ? faceOut + 180f
+                         : faceOut;
             // 採掘中は着地して小さく(=惑星に降りた表現)。往復中は通常サイズ。
-            SetMarker(ship, p, true, rt.phase == Phase.Mining ? LandedScale : 1f);
+            SetMarker(ship, p, true, rt.phase == Phase.Mining ? LandedScale : 1f, facing);
             UpdateMiningRobot(ship, rt, spot);
         }
 
@@ -630,7 +635,7 @@ namespace SpaceMining.Game
 
         const float LandedScale = 0.5f;   // 着地(採掘中)は宇宙船を小さく=惑星に降りた表現
 
-        void SetMarker(Ship ship, Vector2 pos, bool visible, float scaleMul = 1f)
+        void SetMarker(Ship ship, Vector2 pos, bool visible, float scaleMul = 1f, float? facingDeg = null)
         {
             if (!_marker.TryGetValue(ship, out var tr))
             {
@@ -652,9 +657,13 @@ namespace SpaceMining.Game
             if (!visible) return;
             tr.position = new Vector3(pos.x, pos.y, 0);
             tr.localScale = Vector3.one * _ctrl.CurrentIconWorld * 0.85f * scaleMul;
-            // 機首を原点(地球)から外向き(放射方向)へ。スプライトは +Y が機首なので、
-            // 目標方向へ回す。原点付近は回さない(ゼロ除算回避)。描画のみ・移動計算には不干渉。
-            if (pos.sqrMagnitude > 1e-3f)
+            // 機首(スプライトは +Y=機首)を向ける。facingDeg 指定があればそれ(進行方向/着地の向き)、
+            // 無ければ原点(地球)から外向きの放射方向。描画のみ・移動計算には不干渉。
+            if (facingDeg.HasValue)
+            {
+                tr.rotation = Quaternion.Euler(0f, 0f, facingDeg.Value);
+            }
+            else if (pos.sqrMagnitude > 1e-3f)
             {
                 float ang = Mathf.Atan2(pos.y, pos.x) * Mathf.Rad2Deg - 90f;
                 tr.rotation = Quaternion.Euler(0f, 0f, ang);
