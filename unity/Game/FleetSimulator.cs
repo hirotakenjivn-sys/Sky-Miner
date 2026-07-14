@@ -733,10 +733,11 @@ namespace SpaceMining.Game
             _bottomBar.anchorMin = new Vector2(0, 0); _bottomBar.anchorMax = new Vector2(1, 0); _bottomBar.pivot = new Vector2(0.5f, 0);
             _bottomBar.offsetMin = new Vector2(24, 24); _bottomBar.offsetMax = new Vector2(-24, 200);
 
-            BuildBarButton(0f,      1f / 4f, UiKit.Coin, null,  () => _ctrl.ToggleStore());
-            BuildBarButton(1f / 4f, 2f / 4f, null,       "▲",  () => _ctrl.ToggleUpgrade());
-            BuildBarButton(2f / 4f, 3f / 4f, null,       "▲▼", () => _ctrl.ToggleMarket());
-            BuildBarButton(3f / 4f, 1f,      null,       "⚙",  () => _ctrl.ToggleFacilities());
+            // 下部バーは線画アイコン(art/ui/*.png があればそれ、無ければグリフ)。
+            BuildBarButton(0f,      1f / 4f, SpriteBank.Ui("store",      out _), "$",  () => _ctrl.ToggleStore());
+            BuildBarButton(1f / 4f, 2f / 4f, SpriteBank.Ui("upgrade",    out _), "▲",  () => _ctrl.ToggleUpgrade());
+            BuildBarButton(2f / 4f, 3f / 4f, SpriteBank.Ui("market",     out _), "▲▼", () => _ctrl.ToggleMarket());
+            BuildBarButton(3f / 4f, 1f,      SpriteBank.Ui("facilities", out _), "⚙",  () => _ctrl.ToggleFacilities());
         }
 
         void BuildBarButton(float ax0, float ax1, Sprite icon, string glyph, UnityEngine.Events.UnityAction onClick)
