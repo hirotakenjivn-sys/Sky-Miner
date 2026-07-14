@@ -134,27 +134,17 @@ namespace SpaceMining.Game
                 go.transform.SetParent(_ctrl.MapRoot, false);
                 var sr = go.AddComponent<SpriteRenderer>();
                 sr.sortingOrder = 7;   // 着地した船より前面
-                var bgo = new GameObject("blend");   // クロスフェード用(次コマを重ねてカクつきを消す)
-                bgo.transform.SetParent(go.transform, false);
-                bgo.AddComponent<SpriteRenderer>().sortingOrder = 8;
                 tr = go.transform;
                 _robot[ship] = tr;
             }
             var rsr = tr.GetComponent<SpriteRenderer>();
-            var bsr = tr.GetChild(0).GetComponent<SpriteRenderer>();
             if (rsr.enabled != show) rsr.enabled = show;
-            if (bsr.enabled != show) bsr.enabled = show;
             if (!show) return;
             rt.robotTimer += Time.deltaTime * _ctrl.State.TimeScale;
-            // 前進ループ+隣コマのクロスフェード。8コマを左から順に、次コマを frac で重ねて滑らかに繋ぐ。
+            // 前進ループ再生(0→1→…→末→0)。8コマを左から順に再生。
             int nf = frames.Length;
-            float posf = rt.robotTimer * RobotFps;
-            int f = nf <= 1 ? 0 : ((int)posf) % nf;
-            int f2 = nf <= 1 ? 0 : (f + 1) % nf;
-            float frac = posf - Mathf.Floor(posf);
+            int f = nf <= 1 ? 0 : (int)(rt.robotTimer * RobotFps) % nf;
             rsr.sprite = frames[f];
-            bsr.sprite = frames[f2];
-            bsr.color = new Color(1f, 1f, 1f, Mathf.SmoothStep(0f, 1f, frac));   // 次コマを滑らかに重ねる
             // 宇宙船の脇にずらして配置(重なり防止)。接線方向へオフセット、サイズは船より小さく。
             Vector2 n = spot.sqrMagnitude > 1e-4f ? spot.normalized : Vector2.up;
             Vector2 tangent = new Vector2(-n.y, n.x);
