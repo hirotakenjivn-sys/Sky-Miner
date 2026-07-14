@@ -634,6 +634,7 @@ namespace SpaceMining.Game
         }
 
         const float LandedScale = 0.5f;   // 着地(採掘中)は宇宙船を小さく=惑星に降りた表現
+        const float ShipIconScale = 0.72f; // 宇宙船マーカーの基準スケール(2026-07-14 少しだけ縮小 0.85→0.72)
 
         void SetMarker(Ship ship, Vector2 pos, bool visible, float scaleMul = 1f, float? facingDeg = null)
         {
@@ -656,7 +657,7 @@ namespace SpaceMining.Game
             if (srr.enabled != visible) srr.enabled = visible;
             if (!visible) return;
             tr.position = new Vector3(pos.x, pos.y, 0);
-            tr.localScale = Vector3.one * _ctrl.CurrentIconWorld * 0.85f * scaleMul;
+            tr.localScale = Vector3.one * _ctrl.CurrentIconWorld * ShipIconScale * scaleMul;
             // 機首(スプライトは +Y=機首)を向ける。facingDeg 指定があればそれ(進行方向/着地の向き)、
             // 無ければ原点(地球)から外向きの放射方向。描画のみ・移動計算には不干渉。
             if (facingDeg.HasValue)

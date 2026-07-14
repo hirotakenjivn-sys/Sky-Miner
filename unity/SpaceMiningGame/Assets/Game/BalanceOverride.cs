@@ -17,8 +17,9 @@ namespace SpaceMining.Game
         //   CLAUDE.md「移動時間=実距離÷統一速度(線形)」の確定仕様を上書きする。理由:対数配置の
         //   マップ上で実距離線形だと遠方の船が這うように見える(画面距離は圧縮・時間は線形)。
         //   → 片道 = 画面距離(body.Pos の原点からの大きさ) ÷ この視覚速度[world/秒]。
-        //   V=120 で 月片道≈1.0s / エロス≈1.9s / 火星≈2.9s / ケレス≈3.4s(一定の画面速度=自然な飛行)。
-        public const double VisualTravelSpeedWorldPerSec = 120.0;
+        //   V=100 で 月片道≈1.2s / エロス≈2.3s / 火星≈3.5s / ケレス≈4.1s(一定の画面速度=自然な飛行)。
+        //   2026-07-14:体感で「少しだけ遅く」の要望により 120→100(≈17%減速)。
+        public const double VisualTravelSpeedWorldPerSec = 100.0;
         // 旧:実距離線形の速度[km/s]。2-ii移行後は未使用(参照が消えたら削除可)。
         public const double BaseTravelSpeedKmPerSec = 250000.0;
         // 8倍速だが採掘セッション時間は固定のため1便全体は約4倍速→収入レート約4倍。
@@ -43,11 +44,17 @@ namespace SpaceMining.Game
         public const double BulkBaseCountPerSession = 2.0; // バルクの暫定固定個数/session(将来 体積単位で再設計)
 
         // ── 精錬(鉱石→金属の二層価格。[[refining]])
-        // 金属売値 = 鉱石当日単価 × これ(= 回収率0.7 ÷ 品位0.35 = 2.0。将来 回収率強化で可変)。
-        public const double RefineFactor = 2.0;
-        // 精錬所の処理能力[個/秒](暫定。1隻の採掘レートと同程度に置き、船が増えると滞留する=
+        // 2026-07-14:「100個(1000個)の鉱石で1個の金属」という濃縮の手触りに変更(ユーザー要望)。
+        //   鉱石を RefineInputPerOutput 個 消費して 金属を 1 個 生成する。
+        //   金属売値 = 鉱石当日単価 × RefineInputPerOutput × RefineFactor。
+        //   → 例:100個の鉱石(=100p相当)を 1個の金属(=200p相当)へ = 全体で RefineFactor(2.0)倍の付加価値。
+        //     旧1:1と最終的な収入倍率は同じで、見た目だけ「大量の鉱石→少数の輝く金属」になる。
+        public const int RefineInputPerOutput = 100;    // 鉱石N個 → 金属1個(暫定100。1000にすればより濃縮)
+        public const double RefineFactor = 2.0;         // 消費鉱石に対する付加価値倍率(精錬プレミアム)
+        // 精錬所の処理能力[鉱石個/秒](暫定。この個数ぶんの鉱石を毎秒 濃縮に回す。
+        //  N:1 のため 1金属あたり RefineInputPerOutput/この値 秒かかる。船が増えて鉱石流入が上回ると滞留=
         //  「安い鉱石を今売る/待って高い金属で売る」の選択が出る。将来は精錬能力の強化軸を追加可)。
-        public const double RefineUnitsPerSec = 0.1;
+        public const double RefineUnitsPerSec = 5.0;
 
         // ── 施設アンロック(店で購入して解禁。[[facilities]])。すべて暫定値・要調整。
         // 正式には進行シミュ(充足率)と合わせて xlsx で調整する。

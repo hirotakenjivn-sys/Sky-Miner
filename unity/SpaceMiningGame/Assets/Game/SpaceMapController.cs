@@ -106,11 +106,12 @@ namespace SpaceMining.Game
         public SpeedCurve Speed => _speed;
 
         // 当日市況の売却単価(市況があればそれ、無ければ基準価格へフォールバック)。
-        // 金属(精錬品)は 元鉱石の当日単価 × RefineFactor で二層価格にする。
+        // 金属(精錬品)は 元鉱石の当日単価 × RefineInputPerOutput × RefineFactor で二層価格に。
+        //   鉱石N個を1個に濃縮しているので、金属1個は消費したN個ぶんの価値×プレミアムを持つ。
         public double PriceOf(string id)
         {
             if (Refinery.IsRefinedId(id))
-                return PriceOf(Refinery.OreOf(id)) * BalanceOverride.RefineFactor;
+                return PriceOf(Refinery.OreOf(id)) * BalanceOverride.RefineInputPerOutput * BalanceOverride.RefineFactor;
             if (Factory.IsProduct(id))          // 工場の合金製品は固定売値
                 return Factory.SalePrice(id);
             var m = _market?.Get(id);

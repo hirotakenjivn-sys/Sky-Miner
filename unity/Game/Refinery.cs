@@ -1,8 +1,9 @@
 // 精錬所(MVP)。持ち帰った鉱石を金属へ変換する二層価格の実装。
 //   - 対象は 鉄・ニッケル・チタン の鉱石(CLAUDE.md「精錬はMVPに含む」)。
-//   - 背景で自動処理:毎フレーム RefineUnitsPerSec×dt 個ぶん、在庫の鉱石を 1:1 で金属へ。
-//     処理能力を超える鉱石は在庫に滞留 → 「安い鉱石を今売る/待って高い金属で売る」の選択。
-//   - 金属の売値 = 鉱石の当日単価 × RefineFactor(回収率÷品位=2.0)。店でそのまま売れる。
+//   - 背景で自動処理:鉱石 RefineInputPerOutput 個 → 金属 1 個 の濃縮(2026-07-14 変更)。
+//     毎秒 RefineUnitsPerSec 個ぶんの鉱石を濃縮に回す。流入が上回れば在庫に滞留 →
+//     「安い鉱石を今売る/待って高い金属で売る」の選択。端数の鉱石は消費せず残す。
+//   - 金属の売値 = 鉱石の当日単価 × RefineInputPerOutput × RefineFactor。店でそのまま売れる。
 //   - オフライン中も継続(不在秒×能力ぶん、在庫の鉱石を上限に変換)。
 // 収入は在庫→店で手動売却のまま([[sell-model-change]])。精錬は「在庫の価値を上げる」だけ。
 using System.Collections.Generic;
@@ -50,35 +51,42 @@ namespace SpaceMining.Game
             if (_ctrl == null || !_ctrl.State.RefineryUnlocked) return;
             float dt = Time.deltaTime * _ctrl.State.TimeScale;
             _accum += BalanceOverride.RefineUnitsPerSec * dt;
-            int budget = (int)_accum;
-            if (budget <= 0) return;
-            _accum -= Refine(_ctrl.Inventory, budget);
+            // 金属1個ぶん(鉱石 RefineInputPerOutput 個)の予算が貯まるまで待つ。
+            if (_accum < BalanceOverride.RefineInputPerOutput) return;
+            int budgetOre = (int)_accum;
+            int usedOre = Refine(_ctrl.Inventory, budgetOre);
+            _accum -= usedOre;
+            // 鉱石不足で1個も濃縮できなかった時は、貯めすぎず「1個ぶん構えて」在庫到着に即応。
+            if (usedOre == 0) _accum = BalanceOverride.RefineInputPerOutput;
         }
 
-        // オフライン復帰:不在秒×能力ぶん、在庫の鉱石を金属へ(在庫を上限に)。
+        // オフライン復帰:不在秒×能力ぶん、在庫の鉱石を金属へ濃縮(在庫を上限に)。消費した鉱石数を返す。
         public int ApplyOffline(double elapsedSec)
         {
             if (_ctrl == null || !_ctrl.State.RefineryUnlocked || elapsedSec < 1) return 0;
-            int budget = (int)(BalanceOverride.RefineUnitsPerSec * elapsedSec);
-            return budget > 0 ? Refine(_ctrl.Inventory, budget) : 0;
+            int budgetOre = (int)(BalanceOverride.RefineUnitsPerSec * elapsedSec);
+            return budgetOre >= BalanceOverride.RefineInputPerOutput ? Refine(_ctrl.Inventory, budgetOre) : 0;
         }
 
-        // 在庫の鉱石を最大 budget 個、金属へ 1:1 変換。実際に精錬した個数を返す。
-        static int Refine(Inventory inv, int budget)
+        // 在庫の鉱石を最大 budgetOre 個ぶん濃縮:鉱石 N 個 → 金属 1 個(N=RefineInputPerOutput)。
+        // 端数の鉱石は消費せず在庫に残す。実際に消費した鉱石数を返す。
+        static int Refine(Inventory inv, int budgetOre)
         {
-            int done = 0;
+            int ratio = BalanceOverride.RefineInputPerOutput;
+            int usedOre = 0;
             foreach (var kv in Recipes)
             {
-                if (done >= budget) break;
+                if (budgetOre - usedOre < ratio) break;   // 残予算で金属1個も作れない
                 string ore = kv.Key;
                 int have = (int)inv.KgOf(ore);
-                int take = Mathf.Min(budget - done, have);
-                if (take <= 0) continue;
+                int metals = Mathf.Min(have / ratio, (budgetOre - usedOre) / ratio);
+                if (metals <= 0) continue;
+                int take = metals * ratio;
                 inv.Take(ore, take);
-                inv.Add(kv.Value.id, kv.Value.name, take);
-                done += take;
+                inv.Add(kv.Value.id, kv.Value.name, metals);
+                usedOre += take;
             }
-            return done;
+            return usedOre;
         }
     }
 }
