@@ -37,6 +37,9 @@ namespace SpaceMining.Game
         //(接近感)。付録A の icon_d=24px / min_dR=60px なので固定でも重ならない。
         [Tooltip("アイコンのワールド固定径[px]。ズームインでこの実サイズのまま画面上で拡大する")]
         public float baseIconWorld = 60f;
+        // 天体アイコンだけを相対的に大きくする倍率(船/ロボ/オフセットは CurrentIconWorld 基準のまま)。
+        // 2026-07-15:惑星上のロボがぎりぎりだったので惑星を少し大きく(ユーザー要望)。
+        public float bodyIconScale = 1.35f;
         [Tooltip("引ききった時に点が消えないための画面下限(orthoSize×この係数を径の下限に)")]
         public float iconMinScreenFactor = 0.02f;
         public float labelScreenFactor = 0.5f;
@@ -675,13 +678,13 @@ namespace SpaceMining.Game
                 var lmr = v.label.GetComponent<MeshRenderer>();
                 if (lmr.enabled != labelOn) lmr.enabled = labelOn;
 
-                v.icon.localScale = Vector3.one * iconScale;
+                v.icon.localScale = Vector3.one * (iconScale * bodyIconScale);
                 if (labelOn)
                 {
                     v.label.text = LabelFor(v.body, _lodTier);
                     v.label.characterSize = labelChar;
                     // アイコン右脇に置く(アイコンがワールド固定径なので径に追従)
-                    v.labelTr.localPosition = new Vector3(iconScale * 0.65f, 0f, 0f);
+                    v.labelTr.localPosition = new Vector3(iconScale * bodyIconScale * 0.65f, 0f, 0f);
                 }
 
                 // 🔒 は詳細寄り(L2/L3)かつアイコン可視時のみ、アイコン中心に重ねる
@@ -704,7 +707,7 @@ namespace SpaceMining.Game
             if (!vis) return;
             float iconScale = IconWorldSize();
             _selRing.position = new Vector3(_selected.Pos.x, _selected.Pos.y, 0);
-            _selRing.localScale = Vector3.one * iconScale * 2.1f;
+            _selRing.localScale = Vector3.one * iconScale * bodyIconScale * 2.1f;
         }
 
         // ------------------------------------------------------------ 簡易トースト / 選択情報

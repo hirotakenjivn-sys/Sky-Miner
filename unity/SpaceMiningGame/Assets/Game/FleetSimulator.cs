@@ -483,13 +483,27 @@ namespace SpaceMining.Game
                     break;
             }
             rt.worldPos = p; rt.visible = true;
-            // 機首を進行方向へ。往路=惑星へ / 着地(採掘)=そこから90°反時計回り / 帰路=180°(地球へ)。
             float faceOut = Mathf.Atan2(spot.y, spot.x) * Mathf.Rad2Deg - 90f;
-            float facing = rt.phase == Phase.Mining ? faceOut + 90f
-                         : rt.phase == Phase.Return ? faceOut + 180f
-                         : faceOut;
-            // 採掘中は着地して小さく(=惑星に降りた表現)。往復中は通常サイズ。
-            SetMarker(ship, p, true, rt.phase == Phase.Mining ? LandedScale : 1f, facing);
+            // 着陸を手前から:接近の最後 LandFrac ぶんで land 0→1 に。徐々に縮小しながら機首を +90°回す。
+            //   往路=着地へ(land 0→1) / 採掘=着地(land 1) / 帰路=離陸(land 1→0、機首を +90→+180 の帰路へ)。
+            float a = Mathf.Clamp01(rt.elapsed / oneway);
+            float land, facing;
+            if (rt.phase == Phase.Mining)
+            {
+                land = 1f; facing = faceOut + 90f;
+            }
+            else if (rt.phase == Phase.Return)
+            {
+                land = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(1f - a / LandFrac));   // 離陸で戻す
+                facing = faceOut + 90f + 90f * (1f - land);                          // 着地(+90)→帰路(+180)
+            }
+            else // Outbound
+            {
+                land = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((a - (1f - LandFrac)) / LandFrac));
+                facing = faceOut + 90f * land;                                       // 進行方向→着地(+90)へ
+            }
+            float scaleMul = Mathf.Lerp(1f, LandedScale, land);
+            SetMarker(ship, p, true, scaleMul, facing);
             UpdateMiningRobot(ship, rt, spot);
         }
 
@@ -638,6 +652,7 @@ namespace SpaceMining.Game
 
         const float LandedScale = 0.5f;   // 着地(採掘中)は宇宙船を小さく=惑星に降りた表現
         const float ShipIconScale = 0.72f; // 宇宙船マーカーの基準スケール(2026-07-14 少しだけ縮小 0.85→0.72)
+        const float LandFrac = 0.40f;      // 接近の最後この割合で着陸準備(縮小+90°回転)。離陸も同割合で逆再生
 
         void SetMarker(Ship ship, Vector2 pos, bool visible, float scaleMul = 1f, float? facingDeg = null)
         {
