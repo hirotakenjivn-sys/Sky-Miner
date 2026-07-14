@@ -162,9 +162,17 @@ namespace SpaceMining.Game
             return null;
         }
 
-        // 資源アイコン:id のハッシュから色相と形(0キューブ/1宝石/2インゴット)を決める。
+        // 資源アイコン:id の「種別」で形を描き分ける(シルエットで区別)。
+        //   精錬金属(*_refined)   → なめらかな金属バー(かまぼこ形)+つや。RefinedColor で色。
+        //   工場製品(steel 等)    → 合金ブロック/延べ板(2.5D)+固有色。ProductColor で色。
+        //   通常の鉱石(既存)      → ゴツゴツ塊。id ハッシュで色相と形(0キューブ/1宝石/2インゴット)。
+        // 色はいずれも id をキーに決定的(乱数不可)。
         static Texture2D MakeResource(string id)
         {
+            if (Refinery.IsRefinedId(id)) return MetalBar(RefinedColor(id));   // 精錬金属
+            if (Factory.IsProduct(id))    return AlloyBlock(ProductColor(id), id == "carbide"); // 工場製品
+
+            // ── 通常の鉱石(現状維持):id ハッシュで色相と形
             int h = Hash(id);
             float hue = (h & 0xFFFF) / 65535f;
             var col = Color.HSVToRGB(hue, 0.55f, 0.95f);
@@ -175,6 +183,127 @@ namespace SpaceMining.Game
                 2 => Ingot(col),
                 _ => IsoCube(col),
             };
+        }
+
+        // 精錬金属の色(元鉱石の色相を継承しつつ現実寄り。id キーの固定テーブル=決定的)。
+        //   鉄=中間グレー / ニッケル=淡緑灰 / チタン=青灰。未知の *_refined は鉄色で代替。
+        static Color RefinedColor(string id) => id switch
+        {
+            "iron_refined"     => new Color(0.69f, 0.71f, 0.74f),   // 灰(素の鉄)
+            "nickel_refined"   => new Color(0.73f, 0.79f, 0.72f),   // 淡緑灰
+            "titanium_refined" => new Color(0.66f, 0.72f, 0.83f),   // 青灰
+            _                  => new Color(0.70f, 0.72f, 0.75f),
+        };
+
+        // 工場製品の色(製品ごとに固有・id キーの固定テーブル=決定的)。未知の製品は鋼色で代替。
+        static Color ProductColor(string id) => id switch
+        {
+            "steel"     => new Color(0.44f, 0.51f, 0.61f),   // 鋼=青灰
+            "brass"     => new Color(0.82f, 0.64f, 0.20f),   // 真鍮=金黄
+            "stainless" => new Color(0.83f, 0.86f, 0.90f),   // ステンレス=白銀
+            "die_steel" => new Color(0.31f, 0.33f, 0.38f),   // ダイス鋼=濃灰
+            "hss"       => new Color(0.52f, 0.47f, 0.62f),   // ハイス=紫灰
+            "carbide"   => new Color(0.16f, 0.17f, 0.21f),   // 超硬合金=黒(エッジ光沢は別途)
+            _           => new Color(0.44f, 0.51f, 0.61f),
+        };
+
+        // 精錬金属バー(かまぼこ形/横長カプセル):なめらかな金属光沢。
+        // 断面ドームの明暗グラデ + 鋭いスペキュラ筋 + 端の丸み。鉱石の「塊」とシルエットで区別。
+        static Texture2D MetalBar(Color c)
+        {
+            const int n = 48;
+            var t = new Texture2D(n, n, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+            const float hw = 0.40f;    // 横半長
+            const float ry = 0.17f;    // 縦半厚(=端の半径)
+            const float cyv = 0.00f;   // 縦中心
+            const float coreHalf = hw - ry;   // 直線胴の半長(端はここから半円)
+            var px = new Color32[n * n];
+            for (int y = 0; y < n; y++)
+                for (int x = 0; x < n; x++)
+                {
+                    float fx = (x + 0.5f) / n - 0.5f;
+                    float fy = (y + 0.5f) / n - 0.5f - cyv;
+                    // カプセル(丸端の横バー)までの距離
+                    float qx = Mathf.Clamp(fx, -coreHalf, coreHalf);
+                    float dx = fx - qx;
+                    float dist = Mathf.Sqrt(dx * dx + fy * fy);
+                    float a = Mathf.Clamp01((ry - dist) * n / 1.5f);   // ふち AA
+                    if (a <= 0f) { px[y * n + x] = new Color32(0, 0, 0, 0); continue; }
+
+                    float v = fy / ry;                     // -1 下 .. +1 上(断面ドーム)
+                    float g = Mathf.SmoothStep(0f, 1f, (v + 1f) * 0.5f);
+                    Color cc = Color.Lerp(c * 0.70f, c * 1.14f, g);
+                    // 上寄りの鋭いスペキュラ筋(金属のつや)
+                    float sv = v - 0.42f;
+                    float spec = Mathf.Exp(-(sv * sv) / (2f * 0.020f));
+                    cc = Color.Lerp(cc, Color.white, spec * 0.60f);
+                    // 上端リムをわずかに明るく、下端を締める(立体感)
+                    if (v > 0.80f) cc = Color.Lerp(cc, Color.white, (v - 0.80f) / 0.20f * 0.25f);
+                    if (v < -0.72f) cc *= 0.82f;
+                    cc.a = a;
+                    px[y * n + x] = cc;
+                }
+            t.SetPixels32(px); t.Apply();
+            return t;
+        }
+
+        // 工場製品(合金ブロック/延べ板):2.5D の平たいビレット(上面=明・前面=胴)。
+        // なめらかな面 + 稜線ハイライトで「加工品」らしさ。鉱石キューブ(3面)ともバーとも区別。
+        // edgeSheen=true(超硬合金)はシルエット外周に白い光沢エッジを足す。
+        static Texture2D AlloyBlock(Color c, bool edgeSheen)
+        {
+            const int n = 48;
+            var t = new Texture2D(n, n, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+            var top   = c * 1.28f; top.a = 1f;     // 上面(受光)
+            var front = c;         front.a = 1f;    // 前面(胴)
+            // 面の配置(fx,fy は -0.5..0.5)
+            const float fb = -0.24f, fm = 0.04f, ft = 0.26f;   // 前面下端 / 稜線 / 上面奥端
+            const float fw = 0.34f, skew = 0.13f;              // 前面半幅 / 上面の奥行きずれ
+            var px = new Color32[n * n];
+            for (int y = 0; y < n; y++)
+                for (int x = 0; x < n; x++)
+                {
+                    float fx = (x + 0.5f) / n - 0.5f;
+                    float fy = (y + 0.5f) / n - 0.5f;
+                    Color cc; bool on = false; float edge = 1f;
+
+                    if (fy >= fb && fy < fm && Mathf.Abs(fx) <= fw)
+                    {
+                        // 前面(矩形):左をわずかに明るく縦に軽い陰影
+                        float sh = 1f - (fx + fw) / (2f * fw) * 0.18f;
+                        cc = front * sh; on = true;
+                        edge = Mathf.Min(Mathf.Min(fx + fw, fw - fx), Mathf.Min(fy - fb, fm - fy));
+                    }
+                    else if (fy >= fm && fy <= ft)
+                    {
+                        // 上面(平行四辺形):奥へ行くほど右へ skew
+                        float tt = (fy - fm) / (ft - fm);
+                        float xoff = skew * tt;
+                        float xlo = -fw + xoff, xhi = fw + xoff;
+                        if (fx >= xlo && fx <= xhi)
+                        {
+                            // 上面に斜めの受光グラデ(奥ほど明るい)
+                            float lit = 0.92f + 0.16f * tt;
+                            cc = top * lit; on = true;
+                            edge = Mathf.Min(Mathf.Min(fx - xlo, xhi - fx), Mathf.Min(fy - fm, ft - fy));
+                        }
+                        else cc = default;
+                    }
+                    else cc = default;
+
+                    if (!on) { px[y * n + x] = new Color32(0, 0, 0, 0); continue; }
+
+                    // 稜線(上面と前面の境目)を明るいハイライトで締める
+                    if (fy >= fm - 0.02f && fy <= fm + 0.02f && Mathf.Abs(fx) <= fw)
+                        cc = Color.Lerp(cc, Color.white, 0.45f);
+                    // 超硬合金:外周エッジに光沢
+                    if (edgeSheen && edge < 0.03f)
+                        cc = Color.Lerp(cc, Color.white, (1f - edge / 0.03f) * 0.55f);
+                    cc.a = 1f;
+                    px[y * n + x] = cc;
+                }
+            t.SetPixels32(px); t.Apply();
+            return t;
         }
         static int Hash(string s)
         {
