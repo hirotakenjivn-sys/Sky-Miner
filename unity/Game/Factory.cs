@@ -83,11 +83,18 @@ namespace SpaceMining.Game
         }
 
         SpaceMapController _ctrl;
-        double _accum;   // 端数個の繰り越し
+        double _accum;   // 端数個の繰り越し(=次の製品までの充填 0..1)
+        float _flash;    // 製品を1個作った瞬間の演出タイマー(施設パネルが読む)
         public void Bind(SpaceMapController ctrl) => _ctrl = ctrl;
+
+        // 施設パネルの稼働アニメ用:選択中製品の次の1個までの充填 0..1 と、完成フラッシュ 0..1。
+        public float Progress01 => Mathf.Clamp01((float)_accum);
+        public float Flash01 => Mathf.Clamp01(_flash / FlashDur);
+        const float FlashDur = 0.5f;
 
         void Update()
         {
+            if (_flash > 0f) _flash -= Time.deltaTime;   // 完成フラッシュの減衰(演出)
             // 未購入 or 未選択なら停止。
             if (_ctrl == null || !_ctrl.State.FactoryUnlocked) return;
             string sel = _ctrl.State.FactorySelected;
@@ -97,7 +104,9 @@ namespace SpaceMining.Game
             _accum += BalanceOverride.FactoryUnitsPerSec * dt;
             int budget = (int)_accum;
             if (budget <= 0) return;
-            _accum -= Craft(_ctrl.Inventory, sel, budget);
+            int made = Craft(_ctrl.Inventory, sel, budget);
+            _accum -= made;
+            if (made > 0) _flash = FlashDur;             // 生産成功=製品がポンと出た演出
             // 入力待ちで budget を消化できない間の繰り越しが暴走しないよう軽くクランプ。
             if (_accum > 5) _accum = 5;
         }

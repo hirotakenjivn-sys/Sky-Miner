@@ -85,6 +85,8 @@ namespace SpaceMining.Game
         FleetSimulator _sim;
         Refinery _refinery;
         Factory _factory;
+        public Refinery Refinery => _refinery;   // 施設パネルのゲージ/演出が進捗を読む
+        public Factory Factory => _factory;
         FacilitiesPanel _facilities;
         float _saveTimer;
         Sprite _circle;

@@ -42,11 +42,18 @@ namespace SpaceMining.Game
         public static bool IsRefinable(string oreId) => oreId != null && Recipes.ContainsKey(oreId);
 
         SpaceMapController _ctrl;
-        double _accum;   // 端数個の繰り越し
+        double _accum;   // 濃縮の進捗(鉱石個ぶんの予算)
+        float _flash;    // 金属を1個作った瞬間の演出タイマー(施設パネルが読む)
         public void Bind(SpaceMapController ctrl) => _ctrl = ctrl;
+
+        // 施設パネルの稼働アニメ用:次の金属までの充填 0..1 と、完成フラッシュ 0..1。
+        public float Progress01 => Mathf.Clamp01((float)(_accum / Mathf.Max(1, BalanceOverride.RefineInputPerOutput)));
+        public float Flash01 => Mathf.Clamp01(_flash / FlashDur);
+        const float FlashDur = 0.5f;
 
         void Update()
         {
+            if (_flash > 0f) _flash -= Time.deltaTime;   // 完成フラッシュの減衰(演出。稼働と独立)
             // 未購入(RefineryUnlocked=false)なら稼働しない → 鉱石は鉱石のまま在庫に残る。
             if (_ctrl == null || !_ctrl.State.RefineryUnlocked) return;
             float dt = Time.deltaTime * _ctrl.State.TimeScale;
@@ -56,8 +63,9 @@ namespace SpaceMining.Game
             int budgetOre = (int)_accum;
             int usedOre = Refine(_ctrl.Inventory, budgetOre);
             _accum -= usedOre;
+            if (usedOre > 0) _flash = FlashDur;          // 濃縮成功=金属がポンと出た演出
             // 鉱石不足で1個も濃縮できなかった時は、貯めすぎず「1個ぶん構えて」在庫到着に即応。
-            if (usedOre == 0) _accum = BalanceOverride.RefineInputPerOutput;
+            else _accum = BalanceOverride.RefineInputPerOutput;
         }
 
         // オフライン復帰:不在秒×能力ぶん、在庫の鉱石を金属へ濃縮(在庫を上限に)。消費した鉱石数を返す。

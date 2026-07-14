@@ -16,6 +16,9 @@ namespace SpaceMining.Game
         bool _open, _built;
         RectTransform _panel, _content;
         Text _balance;
+        // 稼働アニメ用に保持する参照(Refresh で作り直すたびに再代入。未購入時は null)。
+        Image _refineFill;                 // 精錬:次の金属までの充填バー
+        Image _factoryFill, _factoryIcon;  // 工場:充填バー + 完成でポンと弾む製品アイコン
 
         const float Pad = 40f, HeaderH = 96f, Gap = 16f;
 
@@ -75,6 +78,7 @@ namespace SpaceMining.Game
         void Refresh()
         {
             if (_content == null) return;
+            _refineFill = _factoryFill = _factoryIcon = null;   // 旧行は破棄=参照を捨てる
             for (int i = _content.childCount - 1; i >= 0; i--) Destroy(_content.GetChild(i).gameObject);
 
             float y = 0f;   // 上端からの距離[px](下方向が正)
@@ -106,6 +110,20 @@ namespace SpaceMining.Game
             }
             y += h + Gap;
             return row;
+        }
+
+        // 稼働ゲージ:トラック(暗)+ 充填(明)。充填Imageを返す(fillAmount/color を Update で駆動)。
+        Image MakeGauge(RectTransform row, float x, float yc, float w, float h)
+        {
+            var track = UiKit.Solid("GaugeBg", row, UiKit.Panel2, raycast: false);
+            UiKit.Place(track.rectTransform, new Vector2(0, 0.5f), x, yc, w, h, 0f);
+            var fill = UiKit.Solid("GaugeFill", row, UiKit.Cyan, raycast: false);
+            UiKit.Place(fill.rectTransform, new Vector2(0, 0.5f), x, yc, w, h, 0f);
+            fill.type = Image.Type.Filled;
+            fill.fillMethod = Image.FillMethod.Horizontal;
+            fill.fillOrigin = (int)Image.OriginHorizontal.Left;
+            fill.fillAmount = 0f;
+            return fill;
         }
 
         void SectionHeader(ref float y, string title)
@@ -166,6 +184,8 @@ namespace SpaceMining.Game
                 // 処理速度(» + 数値。単位は最小限)
                 var spd = UiKit.Label("Spd", row, $"» {BalanceOverride.RefineUnitsPerSec:0.00}", UiKit.FSub, UiKit.Sub, TextAnchor.MiddleLeft);
                 UiKit.Place(spd.rectTransform, new Vector2(0, 0.5f), 300, -40, 300, 60, 0f);
+                // 稼働ゲージ(次の金属までの充填。Update で駆動。完成で白フラッシュ)
+                _refineFill = MakeGauge(row, 24, -86, 680, 16);
             }
         }
 
@@ -217,6 +237,7 @@ namespace SpaceMining.Game
             var pic = UiKit.Icon("P", row, UiKit.Resource(r.productId));
             UiKit.Place(pic.rectTransform, new Vector2(0, 0.5f), 24, top, 90, 90, 0f);
             UiKit.HookTip(pic.gameObject, r.productName);
+            if (selected) _factoryIcon = pic;   // 完成で弾ませる製品アイコン
             var nameL = UiKit.Label("Name", row, r.productName, UiKit.FName, UiKit.Txt, TextAnchor.MiddleLeft, FontStyle.Bold);
             UiKit.Place(nameL.rectTransform, new Vector2(0, 0.5f), 130, top, 320, 70, 0f);
             var coin = UiKit.Icon("Coin", row, UiKit.Coin);
@@ -242,7 +263,9 @@ namespace SpaceMining.Game
                 bool canMake = Factory.CanCraftOne(_ctrl.Inventory, r.productId);
                 var st = UiKit.Label("St", row, canMake ? "稼働中" : "素材待ち", UiKit.FSub,
                     canMake ? UiKit.Green : UiKit.Amber, TextAnchor.MiddleLeft, FontStyle.Bold);
-                UiKit.Place(st.rectTransform, new Vector2(0, 0.5f), 24, bot, 300, 60, 0f);
+                UiKit.Place(st.rectTransform, new Vector2(0, 0.5f), 24, bot + 34, 300, 60, 0f);
+                // 稼働ゲージ(次の製品までの充填。Update で駆動。完成で白フラッシュ+製品アイコンが弾む)
+                _factoryFill = MakeGauge(row, 24, bot - 30, 520, 16);
             }
             // 在庫の製品数(あれば)
             double held = _ctrl.Inventory.KgOf(r.productId);
@@ -269,7 +292,26 @@ namespace SpaceMining.Game
         {
             if (!_open || _balance == null) return;
             _balance.text = $"{_ctrl.State.Nova:#,0}";
-            // 注:購入ボタンの有効/無効と充足表示は開いた時点/操作時に確定する(0.5s毎の全再構築は
+
+            // 稼働アニメ:充填バーを進捗で伸ばし、完成した瞬間だけ白くフラッシュ。工場は製品アイコンも弾む。
+            var rf = _ctrl.Refinery;
+            if (_refineFill != null && rf != null)
+            {
+                _refineFill.fillAmount = rf.Progress01;
+                _refineFill.color = Color.Lerp(UiKit.Cyan, Color.white, rf.Flash01);
+            }
+            var fc = _ctrl.Factory;
+            if (_factoryFill != null && fc != null)
+            {
+                _factoryFill.fillAmount = fc.Progress01;
+                _factoryFill.color = Color.Lerp(UiKit.Cyan, Color.white, fc.Flash01);
+                if (_factoryIcon != null)
+                {
+                    float s = 1f + 0.25f * fc.Flash01;   // 完成でポンと拡大→減衰
+                    _factoryIcon.rectTransform.localScale = new Vector3(s, s, 1f);
+                }
+            }
+            // 注:購入ボタンの有効/無効と充足表示は開いた時点/操作時に確定する(全再構築は
             //     スクロール位置がリセットされ操作を妨げるため行わない)。必要なら再度開いて反映。
         }
     }
