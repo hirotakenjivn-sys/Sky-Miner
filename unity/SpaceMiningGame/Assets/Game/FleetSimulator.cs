@@ -148,7 +148,7 @@ namespace SpaceMining.Game
             // 宇宙船の脇にずらして配置(重なり防止)。接線方向へオフセット、サイズは船より小さく。
             Vector2 n = spot.sqrMagnitude > 1e-4f ? spot.normalized : Vector2.up;
             Vector2 tangent = new Vector2(-n.y, n.x);
-            Vector2 rpos = spot + tangent * (_ctrl.CurrentIconWorld * 0.55f);
+            Vector2 rpos = spot + tangent * (_ctrl.CurrentIconWorld * 0.18f);   // 惑星の上に留める(飛び出し防止)
             tr.position = new Vector3(rpos.x, rpos.y, -0.1f);
             tr.localScale = Vector3.one * _ctrl.CurrentIconWorld * 0.28f;
         }
