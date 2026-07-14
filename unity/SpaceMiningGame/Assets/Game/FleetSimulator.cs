@@ -141,13 +141,16 @@ namespace SpaceMining.Game
             if (rsr.enabled != show) rsr.enabled = show;
             if (!show) return;
             rt.robotTimer += Time.deltaTime * _ctrl.State.TimeScale;
-            // ピンポン再生(0→末→0)。前進コマ→後退コマで正味の移動が相殺され「その場で採掘」に見える。
+            // 前進ループ再生(0→1→…→末→0)。8コマを左から順に=振り上げ→掘り下げを自然に繰り返す。
             int nf = frames.Length;
-            int f = nf <= 1 ? 0 : (int)(rt.robotTimer * RobotFps) % (2 * (nf - 1));
-            if (f >= nf) f = 2 * (nf - 1) - f;
+            int f = nf <= 1 ? 0 : (int)(rt.robotTimer * RobotFps) % nf;
             rsr.sprite = frames[f];
-            tr.position = new Vector3(spot.x, spot.y, -0.1f);
-            tr.localScale = Vector3.one * _ctrl.CurrentIconWorld * 0.45f;
+            // 宇宙船の脇にずらして配置(重なり防止)。接線方向へオフセット、サイズは船より小さく。
+            Vector2 n = spot.sqrMagnitude > 1e-4f ? spot.normalized : Vector2.up;
+            Vector2 tangent = new Vector2(-n.y, n.x);
+            Vector2 rpos = spot + tangent * (_ctrl.CurrentIconWorld * 0.55f);
+            tr.position = new Vector3(rpos.x, rpos.y, -0.1f);
+            tr.localScale = Vector3.one * _ctrl.CurrentIconWorld * 0.28f;
         }
 
         // オフライン進行:不在秒数ぶん、派遣中の各船が何便こなせたかを期待値で計算して在庫へ加算。
