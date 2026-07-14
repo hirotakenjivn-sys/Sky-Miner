@@ -85,7 +85,7 @@ namespace SpaceMining.Game
             var bg = row.gameObject.AddComponent<Image>();
             bg.sprite = UiKit.White; bg.color = UiKit.Row; bg.raycastTarget = true;
 
-            var ic = UiKit.Icon("Icon", row, SpriteBank.Ship(ShipType.Transport, out _), UiKit.Ship);
+            var ic = UiKit.Icon("Icon", row, SpriteBank.Ship(ShipType.Transport, out _), Color.white);
             UiKit.Place(ic.rectTransform, new Vector2(0, 0.5f), 20, 0, RowH * 0.42f, RowH * 0.42f, 0f);
 
             var lvL = UiKit.Label("Cnt", row, $"×{count}", UiKit.FName, UiKit.Txt, TextAnchor.MiddleLeft, FontStyle.Bold);

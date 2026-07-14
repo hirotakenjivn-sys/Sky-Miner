@@ -11,6 +11,11 @@ namespace SpaceMining.Game
         public bool DedicatedMinerUnlocked = false; // 専用採掘船+輸送ピストンのペア運用
         public bool AutoSellUnlocked = false;       // 着艦時の自動売却
 
+        // 施設(店で購入して解禁)。未購入なら該当施設は稼働しない。
+        public bool RefineryUnlocked = false;       // 精錬所(鉱石→金属)。未購入なら鉱石は鉱石のまま
+        public bool FactoryUnlocked = false;        // 工場(合金クラフト)
+        public string FactorySelected = null;       // 工場で生産中の製品id(null=停止)
+
         // 強化レベル(1始まり。共通の強化曲線を軸ごとに参照)
         public int MineLevel = 1;   // 採掘速度(抽選間隔を短縮)
         public int CargoLevel = 1;  // 積載量(1セッションの目標個数=当たり率に倍率)

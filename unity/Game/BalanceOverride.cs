@@ -48,5 +48,12 @@ namespace SpaceMining.Game
         // 精錬所の処理能力[個/秒](暫定。1隻の採掘レートと同程度に置き、船が増えると滞留する=
         //  「安い鉱石を今売る/待って高い金属で売る」の選択が出る。将来は精錬能力の強化軸を追加可)。
         public const double RefineUnitsPerSec = 0.1;
+
+        // ── 施設アンロック(店で購入して解禁。[[facilities]])。すべて暫定値・要調整。
+        // 正式には進行シミュ(充足率)と合わせて xlsx で調整する。
+        public const double RefineryUnlockCost = 300000.0;   // 精錬所の解禁費(暫定)
+        public const double FactoryUnlockCost  = 2000000.0;  // 工場の解禁費(暫定)
+        // 工場のクラフト速度[個/秒](暫定。精錬より遅く、在庫の入力素材がある限り生産)。
+        public const double FactoryUnitsPerSec = 0.05;
     }
 }

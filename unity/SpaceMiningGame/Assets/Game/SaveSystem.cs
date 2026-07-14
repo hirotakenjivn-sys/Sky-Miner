@@ -14,6 +14,8 @@ namespace SpaceMining.Game
         public double nova;
         public int mineLevel = 1, cargoLevel = 1;
         public bool dedicatedMiner, autoSell;
+        public bool refineryUnlocked, factoryUnlocked;
+        public string factorySelected;
         public List<SaveInv> inventory = new List<SaveInv>();
         public List<int> shipAssign = new List<int>();
         public List<int> unlocked = new List<int>();               // 開放天体No
@@ -34,6 +36,9 @@ namespace SpaceMining.Game
                 cargoLevel = c.State.CargoLevel,
                 dedicatedMiner = c.State.DedicatedMinerUnlocked,
                 autoSell = c.State.AutoSellUnlocked,
+                refineryUnlocked = c.State.RefineryUnlocked,
+                factoryUnlocked = c.State.FactoryUnlocked,
+                factorySelected = c.State.FactorySelected,
                 savedUnix = Now(),
             };
             foreach (var e in c.Inventory.Entries)
@@ -59,6 +64,9 @@ namespace SpaceMining.Game
             c.State.CargoLevel = Mathf.Max(1, d.cargoLevel);
             c.State.DedicatedMinerUnlocked = d.dedicatedMiner;
             c.State.AutoSellUnlocked = d.autoSell;
+            c.State.RefineryUnlocked = d.refineryUnlocked;
+            c.State.FactoryUnlocked = d.factoryUnlocked;
+            c.State.FactorySelected = string.IsNullOrEmpty(d.factorySelected) ? null : d.factorySelected;
             c.State.UnlockedResources.Clear();
             if (d.unlockedResources != null)
                 c.State.UnlockedResources.AddRange(d.unlockedResources);

@@ -40,7 +40,8 @@ namespace SpaceMining.Game
 
         void Update()
         {
-            if (_ctrl == null) return;
+            // 未購入(RefineryUnlocked=false)なら稼働しない → 鉱石は鉱石のまま在庫に残る。
+            if (_ctrl == null || !_ctrl.State.RefineryUnlocked) return;
             float dt = Time.deltaTime * _ctrl.State.TimeScale;
             _accum += BalanceOverride.RefineUnitsPerSec * dt;
             int budget = (int)_accum;
@@ -51,7 +52,7 @@ namespace SpaceMining.Game
         // オフライン復帰:不在秒×能力ぶん、在庫の鉱石を金属へ(在庫を上限に)。
         public int ApplyOffline(double elapsedSec)
         {
-            if (_ctrl == null || elapsedSec < 1) return 0;
+            if (_ctrl == null || !_ctrl.State.RefineryUnlocked || elapsedSec < 1) return 0;
             int budget = (int)(BalanceOverride.RefineUnitsPerSec * elapsedSec);
             return budget > 0 ? Refine(_ctrl.Inventory, budget) : 0;
         }

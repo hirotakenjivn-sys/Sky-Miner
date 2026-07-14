@@ -728,14 +728,15 @@ namespace SpaceMining.Game
             lRt.anchorMin = new Vector2(0, 1); lRt.anchorMax = new Vector2(0, 1); lRt.pivot = new Vector2(0, 1);
             lRt.sizeDelta = new Vector2(520, 320); lRt.anchoredPosition = new Vector2(40, -240);
 
-            // 下部メニューバー:店(金貨)/ 強化(▲)/ 市況(▲▼)。3等分・排他トグル。
+            // 下部メニューバー:店(金貨)/ 強化(▲)/ 市況(▲▼)/ 施設(⚙)。4等分・排他トグル。
             _bottomBar = UiKit.Node("BottomBar", root);
             _bottomBar.anchorMin = new Vector2(0, 0); _bottomBar.anchorMax = new Vector2(1, 0); _bottomBar.pivot = new Vector2(0.5f, 0);
             _bottomBar.offsetMin = new Vector2(24, 24); _bottomBar.offsetMax = new Vector2(-24, 200);
 
-            BuildBarButton(0f,      1f / 3f, UiKit.Coin, null,  () => _ctrl.ToggleStore());
-            BuildBarButton(1f / 3f, 2f / 3f, null,       "▲",  () => _ctrl.ToggleUpgrade());
-            BuildBarButton(2f / 3f, 1f,      null,       "▲▼", () => _ctrl.ToggleMarket());
+            BuildBarButton(0f,      1f / 4f, UiKit.Coin, null,  () => _ctrl.ToggleStore());
+            BuildBarButton(1f / 4f, 2f / 4f, null,       "▲",  () => _ctrl.ToggleUpgrade());
+            BuildBarButton(2f / 4f, 3f / 4f, null,       "▲▼", () => _ctrl.ToggleMarket());
+            BuildBarButton(3f / 4f, 1f,      null,       "⚙",  () => _ctrl.ToggleFacilities());
         }
 
         void BuildBarButton(float ax0, float ax1, Sprite icon, string glyph, UnityEngine.Events.UnityAction onClick)

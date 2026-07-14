@@ -84,6 +84,8 @@ namespace SpaceMining.Game
         OfflinePanel _offline;
         FleetSimulator _sim;
         Refinery _refinery;
+        Factory _factory;
+        FacilitiesPanel _facilities;
         float _saveTimer;
         Sprite _circle;
         Sprite _ringSprite;
@@ -109,14 +111,17 @@ namespace SpaceMining.Game
         {
             if (Refinery.IsRefinedId(id))
                 return PriceOf(Refinery.OreOf(id)) * BalanceOverride.RefineFactor;
+            if (Factory.IsProduct(id))          // 工場の合金製品は固定売値
+                return Factory.SalePrice(id);
             var m = _market?.Get(id);
             if (m != null) return m.nova_per_kg;
             return _prices.ById(id)?.nova_per_kg ?? 0;
         }
-        // 前日比(比率)。金属は元鉱石の前日比を流用。市況が無い/該当なしは 0。
+        // 前日比(比率)。金属は元鉱石の前日比を流用。工場製品は固定売値のため 0。市況が無い/該当なしは 0。
         public double Change1d(string id)
         {
             if (Refinery.IsRefinedId(id)) return Change1d(Refinery.OreOf(id));
+            if (Factory.IsProduct(id)) return 0;
             return _market?.Get(id)?.change_1d ?? 0;
         }
 
@@ -199,12 +204,14 @@ namespace SpaceMining.Game
         public MarketPanel MarketUI => _marketPanel;
         public OfflinePanel Offline => _offline;
         public FleetSimulator Sim => _sim;
+        public FacilitiesPanel Facilities => _facilities;
 
-        // 全画面パネル(店/強化/市況/オフライン)がどれか開いているか。
+        // 全画面パネル(店/強化/市況/オフライン/施設)がどれか開いているか。
         // IMGUI描画(採掘ゲージ/ポップ)を前面に出さないためのガードに使う。
         public bool AnyFullPanelOpen =>
             (_store != null && _store.IsOpen) || (_upgrade != null && _upgrade.IsOpen)
-            || (_marketPanel != null && _marketPanel.IsOpen) || (_offline != null && _offline.IsOpen);
+            || (_marketPanel != null && _marketPanel.IsOpen) || (_offline != null && _offline.IsOpen)
+            || (_facilities != null && _facilities.IsOpen);
 
         // 強化の効果倍率(採掘速度・積載)。FleetSimulator が基準値に掛ける。
         public double MineRateMult => _upgradeCurve.EffectMult(_state.MineLevel);
@@ -272,11 +279,23 @@ namespace SpaceMining.Game
             _sim = simGo.AddComponent<FleetSimulator>();
             _sim.Bind(this);
 
-            // 精錬所(在庫の鉱石→金属を背景で処理)
+            // 精錬所(在庫の鉱石→金属を背景で処理。RefineryUnlocked=true の時だけ稼働)
             var refGo = new GameObject("Refinery");
             refGo.transform.SetParent(transform, false);
             _refinery = refGo.AddComponent<Refinery>();
             _refinery.Bind(this);
+
+            // 工場(在庫の素材→合金をクラフト。FactoryUnlocked=true かつ製品選択中の時だけ稼働)
+            var facGo = new GameObject("Factory");
+            facGo.transform.SetParent(transform, false);
+            _factory = facGo.AddComponent<Factory>();
+            _factory.Bind(this);
+
+            // 施設パネル(精錬所・工場の購入/操作UI)
+            var facPanelGo = new GameObject("FacilitiesPanel");
+            facPanelGo.transform.SetParent(transform, false);
+            _facilities = facPanelGo.AddComponent<FacilitiesPanel>();
+            _facilities.Bind(this);
 
             // 本日の市況パネル
             var mktGo = new GameObject("MarketPanel");
@@ -297,6 +316,7 @@ namespace SpaceMining.Game
             {
                 var result = _sim.ApplyOffline(elapsed);
                 _refinery.ApplyOffline(elapsed);   // 留守中も精錬継続(在庫の鉱石→金属)
+                _factory.ApplyOffline(elapsed);    // 留守中も工場稼働(精錬の後:金属→合金の多段)
                 if (result.HasGains) _offline.Show(result);
             }
 
@@ -319,6 +339,7 @@ namespace SpaceMining.Game
             SaveSystem.Clear();
             _state.Nova = 0; _state.MineLevel = 1; _state.CargoLevel = 1;
             _state.DedicatedMinerUnlocked = false; _state.AutoSellUnlocked = false;
+            _state.RefineryUnlocked = false; _state.FactoryUnlocked = false; _state.FactorySelected = null;
             _state.UnlockedResources.Clear();
             _inventory.Clear();
             _fleet.ResetToInitial();      // 増設した宇宙船を初期1隻へ + 全船待機
@@ -596,7 +617,8 @@ namespace SpaceMining.Game
         {
             // 全画面モーダル(店・強化・市況・オフライン)表示中はマップ入力を完全に止める
             if ((_store != null && _store.IsOpen) || (_upgrade != null && _upgrade.IsOpen)
-                || (_offline != null && _offline.IsOpen) || (_marketPanel != null && _marketPanel.IsOpen)) return true;
+                || (_offline != null && _offline.IsOpen) || (_marketPanel != null && _marketPanel.IsOpen)
+                || (_facilities != null && _facilities.IsOpen)) return true;
             // uGUI 化した HUD/シートは EventSystem がクリックを吸う。その上にポインタがあればマップは無視。
             var es = EventSystem.current;
             if (es != null)
@@ -614,10 +636,11 @@ namespace SpaceMining.Game
         public void ToggleStore()   { bool w = _store.IsOpen;       CloseAllPanels(); if (!w) _store.Toggle(); }
         public void ToggleUpgrade() { bool w = _upgrade.IsOpen;     CloseAllPanels(); if (!w) _upgrade.Toggle(); }
         public void ToggleMarket()  { bool w = _marketPanel.IsOpen; CloseAllPanels(); if (!w) _marketPanel.Toggle(); }
-        // 全オーバーレイ(3メニュー+天体シート)を閉じる。2枚同時表示を防ぐ。
+        public void ToggleFacilities() { bool w = _facilities.IsOpen; CloseAllPanels(); if (!w) _facilities.Toggle(); }
+        // 全オーバーレイ(4メニュー+天体シート)を閉じる。2枚同時表示を防ぐ。
         public void CloseAllPanels()
         {
-            _store?.Close(); _upgrade?.Close(); _marketPanel?.Close();
+            _store?.Close(); _upgrade?.Close(); _marketPanel?.Close(); _facilities?.Close();
             Deselect();
         }
 

@@ -42,3 +42,8 @@ venv/
 *.VC.db
 # Unity のバッチ実行ログ(このリポジトリ固有)
 unity/*.log
+
+# Unity がルートを誤プロジェクト化した時の stray(本物は unity/SpaceMiningGame/)
+/Assets/
+/Packages/
+/ProjectSettings/

@@ -5,6 +5,7 @@
 // マップの空タップで閉じる既存挙動はコントローラ側(Deselect)が担う。
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace SpaceMining.Game
 {
@@ -16,7 +17,8 @@ namespace SpaceMining.Game
         int _pendingMiner, _pendingTransport;
 
         bool _built;
-        RectTransform _panel, _inner;
+        RectTransform _panel, _inner, _tipBox;
+        Text _tip;
 
         const float Pad = 40f;
 
@@ -66,6 +68,39 @@ namespace SpaceMining.Game
 
             _inner = UiKit.Node("Inner", _panel);
             UiKit.Stretch(_inner, Pad, 40, Pad, 20);
+
+            // 資源ホバー用ツールチップ(名前表示)。_panel直下=Rebuildで消えない。既定は非表示。
+            var tipImg = UiKit.Solid("Tip", _panel, UiKit.Panel2, raycast: false);
+            _tipBox = tipImg.rectTransform;
+            _tipBox.anchorMin = _tipBox.anchorMax = new Vector2(0, 0);
+            _tipBox.pivot = new Vector2(0.5f, 0f);
+            _tip = UiKit.Label("TipTxt", _tipBox, "", UiKit.FSub, UiKit.Txt, TextAnchor.MiddleCenter);
+            UiKit.Stretch(_tip.rectTransform, 16, 6, 16, 6);
+            _tipBox.gameObject.SetActive(false);
+        }
+
+        // 資源アイコンにホバー(PointerEnter/Exit)で名前ツールチップを出す。
+        void HookTip(RectTransform target, string text)
+        {
+            var et = target.gameObject.AddComponent<EventTrigger>();
+            var enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            enter.callback.AddListener(_ => ShowTip(target, text));
+            et.triggers.Add(enter);
+            var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+            exit.callback.AddListener(_ => _tipBox.gameObject.SetActive(false));
+            et.triggers.Add(exit);
+        }
+
+        void ShowTip(RectTransform target, string text)
+        {
+            _tip.text = text;
+            float w = _tip.preferredWidth + 40f;
+            _tipBox.sizeDelta = new Vector2(Mathf.Max(120f, w), 64f);
+            // アイコンの真上に配置(_panelローカル座標)。
+            Vector3 lp = _panel.InverseTransformPoint(target.TransformPoint(new Vector3(0, target.rect.height * 0.5f, 0)));
+            _tipBox.anchoredPosition = new Vector2(lp.x - _panel.rect.xMin, lp.y - _panel.rect.yMin + 8f);
+            _tipBox.SetAsLastSibling();
+            _tipBox.gameObject.SetActive(true);
         }
 
         // ------------------------------------------------------------ 再構築
@@ -140,6 +175,8 @@ namespace SpaceMining.Game
                     var icon = UiKit.Icon($"R_{r.id}", band, UiKit.Resource(r.id),
                                           unlocked ? Color.white : locked);
                     UiKit.Place(icon.rectTransform, new Vector2(0, 0.5f), x, 0, sz, sz, 0f);
+                    icon.raycastTarget = true;
+                    HookTip(icon.rectTransform, r.name_ja);   // ホバーで資源名を表示
                     x += sz + gap;
                 }
                 return y + sz + 8f;
@@ -251,8 +288,11 @@ namespace SpaceMining.Game
             var band = UiKit.Node($"Ship_{type}", _inner);
             UiKit.TopBand(band, y, 96, 0, 0);
 
+            // 宇宙船アイコン(本番PNGがあればそれ、無ければ手続きシルエット)
+            var shipIcon = UiKit.Icon("ShipIcon", band, SpriteBank.Ship(type, out _), Color.white);
+            UiKit.Place(shipIcon.rectTransform, new Vector2(0, 0.5f), 0, 0, 84, 84, 0f);
             var nameL = UiKit.Label("Name", band, name, UiKit.FName, UiKit.Txt);
-            UiKit.Place(nameL.rectTransform, new Vector2(0, 0.5f), 0, 0, 320, 90, 0f);
+            UiKit.Place(nameL.rectTransform, new Vector2(0, 0.5f), 92, 0, 230, 90, 0f);
 
             int p = pending;   // ローカルにコピー(ラムダから ref は不可)。押下時に再構築で反映。
             var minus = UiKit.Button("Minus", band, UiKit.Panel2);
@@ -272,9 +312,9 @@ namespace SpaceMining.Game
             UiKit.Stretch(pL.rectTransform);
             plus.onClick.AddListener(() => { SetPending(type, Mathf.Min(max, p + 1)); Rebuild(); });
 
-            // 待機 idle/total(船色四角 + 数字。単位テキストなし)
-            var sq = UiKit.Solid("Sq", band, type == ShipType.Miner ? UiKit.Cyan : UiKit.Ship, raycast: false);
-            UiKit.Place(sq.rectTransform, new Vector2(0.72f, 0.5f), 0, 0, 40, 40, 0f);
+            // 待機 idle/total(宇宙船アイコン + 数字。単位テキストなし)
+            var sq = UiKit.Icon("Sq", band, SpriteBank.Ship(type, out _), Color.white);
+            UiKit.Place(sq.rectTransform, new Vector2(0.72f, 0.5f), 0, 0, 46, 46, 0f);
             var it = UiKit.Label("IT", band, $"{f.IdleCount(type)}/{f.TotalCount(type)}", UiKit.FSub, UiKit.Sub);
             UiKit.Place(it.rectTransform, new Vector2(0.72f, 0.5f), 52, 0, 220, 50, 0f);
 
