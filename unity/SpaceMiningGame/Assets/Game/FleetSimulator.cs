@@ -20,7 +20,7 @@ namespace SpaceMining.Game
     {
         public double seconds;
         public int trips;
-        public readonly List<(string name, int count)> gains = new List<(string, int)>();
+        public readonly List<(string id, string name, int count)> gains = new List<(string, string, int)>();
         public bool HasGains => trips > 0 && gains.Count > 0;
     }
 
@@ -189,7 +189,7 @@ namespace SpaceMining.Game
                     _ctrl.Inventory.Add(r.id, r.name_ja, total);
                 }
             }
-            foreach (var kv in byId) res.gains.Add((nameById[kv.Key], kv.Value));
+            foreach (var kv in byId) res.gains.Add((kv.Key, nameById[kv.Key], kv.Value));
             return res;
         }
 

@@ -55,8 +55,8 @@ namespace SpaceMining.Game
             _time = UiKit.Label("Time", boxRt, "0:00", UiKit.FTitle, UiKit.Cyan, TextAnchor.MiddleLeft, FontStyle.Bold);
             UiKit.TopBand(_time.rectTransform, Pad, 80, Pad, Pad);
 
-            // N便(船色 + ×便数)
-            var shipSq = UiKit.Solid("Ship", boxRt, UiKit.Ship, raycast: false);
+            // N便(船アイコン + ×便数)。船スプライト経由=PNG差し替えで他画面と一括反映
+            var shipSq = UiKit.Icon("Ship", boxRt, SpriteBank.Ship(ShipType.Transport, out _));
             var shipRt = shipSq.rectTransform;
             shipRt.anchorMin = new Vector2(0, 1); shipRt.anchorMax = new Vector2(0, 1); shipRt.pivot = new Vector2(0, 1);
             shipRt.sizeDelta = new Vector2(56, 56); shipRt.anchoredPosition = new Vector2(Pad, -Pad - 100);
@@ -99,8 +99,9 @@ namespace SpaceMining.Game
                 row.anchorMin = new Vector2(0, 1); row.anchorMax = new Vector2(1, 1); row.pivot = new Vector2(0.5f, 1f);
                 row.offsetMin = new Vector2(0, -(i + 1) * GainH); row.offsetMax = new Vector2(0, -i * GainH);
 
-                var cube = UiKit.Icon("Cube", row, UiKit.Cube);
-                UiKit.Place(cube.rectTransform, new Vector2(0, 0.5f), 0, 0, GainH * 0.6f, GainH * 0.6f, 0f);
+                // 素材ごとの固有アイコン(市況/店/在庫と同じ中央リゾルバ経由=PNG差し替えで全画面一括反映)
+                var icon = UiKit.Icon("Icon", row, UiKit.Resource(g.id));
+                UiKit.Place(icon.rectTransform, new Vector2(0, 0.5f), 0, 0, GainH * 0.6f, GainH * 0.6f, 0f);
                 var name = UiKit.Label("Name", row, g.name, UiKit.FName, UiKit.Txt);
                 UiKit.Place(name.rectTransform, new Vector2(0, 0.5f), GainH * 0.6f + 12, 0, 400, GainH, 0f);
                 var cnt = UiKit.Label("Cnt", row, $"+{g.count:#,0}", UiKit.FName, UiKit.Green, TextAnchor.MiddleLeft, FontStyle.Bold);
