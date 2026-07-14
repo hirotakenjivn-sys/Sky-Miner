@@ -175,8 +175,7 @@ namespace SpaceMining.Game
                     var icon = UiKit.Icon($"R_{r.id}", band, UiKit.Resource(r.id),
                                           unlocked ? Color.white : locked);
                     UiKit.Place(icon.rectTransform, new Vector2(0, 0.5f), x, 0, sz, sz, 0f);
-                    icon.raycastTarget = true;
-                    HookTip(icon.rectTransform, r.name_ja);   // ホバーで資源名を表示
+                    UiKit.HookTip(icon.gameObject, r.name_ja);   // ホバーで資源名(全画面共通)
                     x += sz + gap;
                 }
                 return y + sz + 8f;

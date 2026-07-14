@@ -130,6 +130,14 @@ namespace SpaceMining.Game
         public IReadOnlyList<string> UnlockOrder => _unlockOrder;
         public bool IsResourceUnlocked(string id) => _state.UnlockedResources.Contains(id);
 
+        // id → 表示名(鉱石/精錬金属/工場製品)。全画面のホバーツールチップ用。
+        public string NameOf(string id)
+        {
+            if (Factory.IsProduct(id)) return Factory.ProductName(id);
+            if (Refinery.IsRefinedId(id)) return Refinery.MetalName(id);
+            return _prices.ById(id)?.name_ja ?? id;
+        }
+
         // アンロック済みの惑星が産出する資源id(重複排除)。市況パネルの表示・解禁対象はこれに限定する。
         public HashSet<string> UnlockedBodyResourceIds()
         {

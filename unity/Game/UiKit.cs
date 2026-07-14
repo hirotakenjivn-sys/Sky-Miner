@@ -10,6 +10,7 @@
 // 端末アスペクト比が変わっても比率は崩れない(IMGUI版の崩れ [[responsive-ui-todo]] を解消)。
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace SpaceMining.Game
 {
@@ -104,6 +105,22 @@ namespace SpaceMining.Game
             img.sprite = sprite; img.color = tint ?? Color.white; img.raycastTarget = false;
             img.preserveAspect = true;
             return img;
+        }
+
+        // 任意のアイコン(Image等)にホバーで名前ツールチップを出す。全画面共通(UiRoot 共有)。
+        public static void HookTip(GameObject target, string text)
+        {
+            if (target == null || string.IsNullOrEmpty(text)) return;
+            var g = target.GetComponent<Graphic>();
+            if (g != null) g.raycastTarget = true;   // ホバー検出に必要
+            var et = target.GetComponent<EventTrigger>();
+            if (et == null) et = target.AddComponent<EventTrigger>();
+            var enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            enter.callback.AddListener(_ => UiRoot.Instance.ShowTip(text));
+            et.triggers.Add(enter);
+            var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+            exit.callback.AddListener(_ => UiRoot.Instance.HideTip());
+            et.triggers.Add(exit);
         }
 
         // テキスト(Legacy uGUI Text + 動的フォント)。単位テキストは基本使わない。

@@ -99,5 +99,49 @@ namespace SpaceMining.Game
             content.sizeDelta = new Vector2(content.sizeDelta.x, h);
             content.anchoredPosition = new Vector2(content.anchoredPosition.x, 0f);
         }
+
+        // ============================================================ 共有ツールチップ(鉱物/素材名)
+        // 全パネル共通。UiKit.HookTip(icon, name) からアイコンにホバー(PointerEnter/Exit)で表示。
+        RectTransform _tipBox; Text _tipText; bool _tipOn;
+
+        void EnsureTip()
+        {
+            if (_tipBox != null) return;
+            var box = UiKit.Solid("Tooltip", Root, UiKit.Panel2, raycast: false);
+            _tipBox = box.rectTransform;
+            _tipBox.anchorMin = _tipBox.anchorMax = new Vector2(0, 0);
+            _tipBox.pivot = new Vector2(0.5f, 0f);
+            _tipText = UiKit.Label("T", _tipBox, "", UiKit.FSub, UiKit.Txt, TextAnchor.MiddleCenter);
+            UiKit.Stretch(_tipText.rectTransform, 22, 8, 22, 8);
+            box.gameObject.SetActive(false);
+        }
+
+        public void ShowTip(string text)
+        {
+            EnsureTip();
+            _tipText.text = text;
+            _tipBox.sizeDelta = new Vector2(Mathf.Max(140f, _tipText.preferredWidth + 48f), 76f);
+            _tipBox.gameObject.SetActive(true);
+            _tipBox.SetAsLastSibling();
+            _tipOn = true;
+            PositionTip();
+        }
+
+        public void HideTip()
+        {
+            if (_tipBox != null) _tipBox.gameObject.SetActive(false);
+            _tipOn = false;
+        }
+
+        void Update() { if (_tipOn) PositionTip(); }   // カーソル追従
+
+        void PositionTip()
+        {
+            if (_tipBox == null) return;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                Root, Input.mousePosition, null, out var lp);   // Overlay なので camera=null
+            // Root のローカル(pivot中心)→ 左下アンカー座標へ。カーソルの少し上に。
+            _tipBox.anchoredPosition = new Vector2(lp.x - Root.rect.xMin, lp.y - Root.rect.yMin + 44f);
+        }
     }
 }

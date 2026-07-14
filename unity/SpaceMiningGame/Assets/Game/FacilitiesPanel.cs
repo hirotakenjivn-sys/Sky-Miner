@@ -160,6 +160,7 @@ namespace SpaceMining.Game
                 {
                     var ic = UiKit.Icon("Ore", row, UiKit.Resource(ore));
                     UiKit.Place(ic.rectTransform, new Vector2(0, 0.5f), x, 30, 64, 64, 0f);
+                    UiKit.HookTip(ic.gameObject, _ctrl.NameOf(ore));
                     x += 74;
                 }
                 // 処理速度(» + 数値。単位は最小限)
@@ -215,6 +216,7 @@ namespace SpaceMining.Game
             // 上段:製品アイコン + 名前 + 売値(金貨+数値)
             var pic = UiKit.Icon("P", row, UiKit.Resource(r.productId));
             UiKit.Place(pic.rectTransform, new Vector2(0, 0.5f), 24, top, 90, 90, 0f);
+            UiKit.HookTip(pic.gameObject, r.productName);
             var nameL = UiKit.Label("Name", row, r.productName, UiKit.FName, UiKit.Txt, TextAnchor.MiddleLeft, FontStyle.Bold);
             UiKit.Place(nameL.rectTransform, new Vector2(0, 0.5f), 130, top, 320, 70, 0f);
             var coin = UiKit.Icon("Coin", row, UiKit.Coin);
@@ -230,6 +232,7 @@ namespace SpaceMining.Game
             {
                 var ic = UiKit.Icon($"In_{ing.id}", row, UiKit.Resource(ing.id));
                 UiKit.Place(ic.rectTransform, new Vector2(0, 0.5f), x, 0, 60, 60, 0f);
+                UiKit.HookTip(ic.gameObject, _ctrl.NameOf(ing.id));
                 x += 70;
             }
 

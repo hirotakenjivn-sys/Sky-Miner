@@ -32,6 +32,12 @@ namespace SpaceMining.Game
 
         public static bool IsRefinedId(string id) => id != null && OreByMetal.ContainsKey(id);
         public static string OreOf(string refinedId) => OreByMetal.TryGetValue(refinedId, out var o) ? o : null;
+        // 金属id → 表示名(精鉄/精ニッケル/精チタン)。ツールチップ用。
+        public static string MetalName(string metalId)
+        {
+            foreach (var kv in Recipes) if (kv.Value.id == metalId) return kv.Value.name;
+            return metalId;
+        }
         public static bool IsRefinable(string oreId) => oreId != null && Recipes.ContainsKey(oreId);
 
         SpaceMapController _ctrl;
