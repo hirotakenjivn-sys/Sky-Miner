@@ -468,7 +468,8 @@ namespace SpaceMining.Game
             switch (rt.phase)
             {
                 case Phase.Outbound:
-                    p = Vector2.Lerp(station, spot, Mathf.Clamp01(rt.elapsed / oneway));
+                    // SmoothStep で発進はゆるやか・惑星手前で減速して着陸(等速の直線移動をやめる)。
+                    p = Vector2.Lerp(station, spot, Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(rt.elapsed / oneway)));
                     if (rt.elapsed >= oneway) { rt.phase = Phase.Mining; rt.elapsed = 0; rt.rollTimer = 0; rt.rollsDone = 0; }
                     break;
                 case Phase.Mining:
@@ -486,7 +487,7 @@ namespace SpaceMining.Game
                     if (rt.rollsDone >= RollsPerSession) { rt.phase = Phase.Return; rt.elapsed = 0; }
                     break;
                 default: // Return
-                    p = Vector2.Lerp(spot, station, Mathf.Clamp01(rt.elapsed / oneway));
+                    p = Vector2.Lerp(spot, station, Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(rt.elapsed / oneway)));
                     if (rt.elapsed >= oneway)
                     {
                         DepositCargo(body, rt.cargo);
@@ -665,7 +666,7 @@ namespace SpaceMining.Game
 
         const float LandedScale = 0.5f;   // 着地(採掘中)は宇宙船を小さく=惑星に降りた表現
         const float ShipIconScale = 0.72f; // 宇宙船マーカーの基準スケール(2026-07-14 少しだけ縮小 0.85→0.72)
-        const float LandFrac = 0.40f;      // 接近の最後この割合で着陸準備(縮小+90°回転)。離陸も同割合で逆再生
+        const float LandFrac = 0.22f;      // 接近の最後この割合で着陸準備(縮小+90°回転)。小さいほど惑星の近くで開始
 
         void SetMarker(Ship ship, Vector2 pos, bool visible, float scaleMul = 1f, float? facingDeg = null)
         {
