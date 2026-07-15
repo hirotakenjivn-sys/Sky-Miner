@@ -59,8 +59,8 @@ namespace SpaceMining.Game
         public float tapMaxDragPx = 12f;
         [Tooltip("タップ判定: この秒数以上の長押しは選択しない")]
         public float tapMaxHold = 0.4f;
-        [Tooltip("タップ当たり判定の甘さ(アイコン画面径に対する倍率)")]
-        public float tapHitFactor = 1.6f;
+        [Tooltip("タップ当たり判定=惑星ディスク視覚半径の倍率(1.0=惑星ぴったり、少し余白で1.1)")]
+        public float tapHitFactor = 1.1f;
 
         // 天体が選択されたとき発火(次タスク: 天体パネル/派遣UI が購読)
         public event Action<CelestialBody> OnBodySelected;
@@ -585,7 +585,9 @@ namespace SpaceMining.Game
         {
             Vector3 world = _cam.ScreenToWorldPoint(screenPos);
             float iconWorld = IconWorldSize();
-            float hitR = Mathf.Max(iconWorld * tapHitFactor, _cam.orthographicSize * 0.02f);
+            // 惑星ディスクの視覚半径 = アイコン径 × 天体倍率 × 0.5。当たり判定はこれを基準に(惑星の形=円)。
+            float planetR = iconWorld * bodyIconScale * 0.5f;
+            float hitR = Mathf.Max(planetR * tapHitFactor, _cam.orthographicSize * 0.02f);
 
             BodyView best = null;
             float bestSq = hitR * hitR;
