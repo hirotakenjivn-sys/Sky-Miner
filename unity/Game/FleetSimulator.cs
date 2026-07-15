@@ -85,6 +85,7 @@ namespace SpaceMining.Game
             public SpriteRenderer sr;
             public Vector2 vel;
             public float life, maxLife;
+            public float rot, spin, sizeMul;   // 岩片の回転・自転・大きさ
             public bool active;
         }
 
@@ -372,15 +373,20 @@ namespace SpaceMining.Game
         }
 
         // ------------------------------------------------------------ 採掘VFX(鉱石片)
-        void EmitOre(Runtime rt, Vector2 pos, float dt)
+        void EmitOre(Runtime rt, Vector2 spot, float dt)
         {
             const float interval = 0.18f;   // この間隔ごとに1片
+            // 採掘ロボの位置から飛散させる(UpdateMiningRobot と同じ接線オフセット 0.18)。
+            float ic = _ctrl.CurrentIconWorld;
+            Vector2 nrm = spot.sqrMagnitude > 1e-4f ? spot.normalized : Vector2.up;
+            Vector2 tangent = new Vector2(-nrm.y, nrm.x);
+            Vector2 robot = spot + tangent * (ic * 0.18f);
             rt.spawnAccum += dt;
             int guard = 0;
             while (rt.spawnAccum >= interval && guard++ < 8)
             {
                 rt.spawnAccum -= interval;
-                SpawnOre(pos);
+                SpawnOre(robot);
             }
         }
 
@@ -390,12 +396,16 @@ namespace SpaceMining.Game
             if (b == null) return;
             float ic = _ctrl.CurrentIconWorld;
             Vector2 dir = UnityEngine.Random.insideUnitCircle.normalized;
-            // 小さく・飛散範囲も狭く
-            b.vel = dir * (ic * UnityEngine.Random.Range(0.35f, 0.9f)) + Vector2.up * (ic * 0.3f);
-            b.maxLife = UnityEngine.Random.Range(0.3f, 0.5f);
+            // ロボの足元から小さく上・外へ弾ける
+            b.vel = dir * (ic * UnityEngine.Random.Range(0.35f, 0.9f)) + Vector2.up * (ic * 0.35f);
+            b.maxLife = UnityEngine.Random.Range(0.3f, 0.55f);
             b.life = b.maxLife;
+            b.sizeMul = UnityEngine.Random.Range(0.7f, 1.3f);          // 岩片ごとに大きさを散らす
+            b.rot = UnityEngine.Random.Range(0f, 360f);
+            b.spin = UnityEngine.Random.Range(-360f, 360f);            // くるくる回転
             b.tr.position = new Vector3(pos.x, pos.y, 0);
-            b.tr.localScale = Vector3.one * ic * 0.07f;
+            b.tr.localRotation = Quaternion.Euler(0, 0, b.rot);
+            b.tr.localScale = Vector3.one * ic * 0.09f * b.sizeMul;
             b.sr.color = OreColor;
             b.sr.enabled = true;
             b.active = true;
@@ -408,7 +418,7 @@ namespace SpaceMining.Game
             var go = new GameObject("orebit");
             go.transform.SetParent(_ctrl.MapRoot, false);
             var sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = _ctrl.CircleSprite;
+            sr.sprite = _ctrl.OreSprite;   // 鉱石チャンク(円→岩っぽい形)
             sr.sortingOrder = 5;
             sr.enabled = false;
             var nb = new OreBit { tr = go.transform, sr = sr };
@@ -424,11 +434,14 @@ namespace SpaceMining.Game
                 if (!b.active) continue;
                 b.life -= dt;
                 if (b.life <= 0f) { b.active = false; b.sr.enabled = false; continue; }
+                b.vel += Vector2.down * (ic * 1.2f * dt);   // 重力で落ちる(掘って弾けて落下)
                 b.tr.position += (Vector3)(b.vel * dt);
-                b.vel *= Mathf.Max(0f, 1f - 2f * dt);   // 空気抵抗で減速
+                b.vel *= Mathf.Max(0f, 1f - 1.2f * dt);      // 空気抵抗で減速
+                b.rot += b.spin * dt;                        // くるくる回転
+                b.tr.localRotation = Quaternion.Euler(0, 0, b.rot);
                 float a = Mathf.Clamp01(b.life / b.maxLife);
                 var c = OreColor; c.a = a; b.sr.color = c;
-                b.tr.localScale = Vector3.one * ic * 0.07f * a;
+                b.tr.localScale = Vector3.one * ic * 0.09f * b.sizeMul * Mathf.Lerp(0.6f, 1f, a);
             }
         }
 

@@ -93,6 +93,7 @@ namespace SpaceMining.Game
         FacilitiesPanel _facilities;
         float _saveTimer;
         Sprite _circle;
+        Sprite _oreSprite;   // 採掘パーティクル用の鉱石チャンク(手続き・白基調→tintで鉱石色)
         Sprite _ringSprite;
         float _maxOrtho;
         int _lodTier = 2;
@@ -233,6 +234,7 @@ namespace SpaceMining.Game
         public GameState State => _state;
         public CelestialBody Selected => _selected;
         public Sprite CircleSprite => _circle;
+        public Sprite OreSprite => _oreSprite;
         public Camera Cam => _cam;
         public Transform MapRoot => transform;               // ノード/リングと同じ親(パン/ズーム追従)
         public float CurrentIconWorld => IconWorldSize();    // 現在のアイコン径(船マーカーの基準)
@@ -265,6 +267,7 @@ namespace SpaceMining.Game
 
             SetupCamera();
             _circle = MakeCircleSprite(64);
+            _oreSprite = MakeOreSprite(48);
             _ringSprite = MakeRingSprite(64, 0.14f);
             DrawRings();
             BuildBodies();
@@ -758,6 +761,35 @@ namespace SpaceMining.Game
             tex.Apply();
             return Sprite.Create(tex, new Rect(0, 0, size, size),
                 new Vector2(0.5f, 0.5f), size);
+        }
+
+        // 鉱石チャンク(採掘パーティクル用)。角度で半径を揺らしたゴツゴツ岩シルエット+上方向の陰影。
+        // 白基調なので SpriteRenderer.color に鉱石色を掛けて使う。
+        static Sprite MakeOreSprite(int size)
+        {
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+            float cx = size * 0.5f, cy = size * 0.5f, baseR = size * 0.34f;
+            var px = new Color32[size * size];
+            for (int y = 0; y < size; y++)
+                for (int x = 0; x < size; x++)
+                {
+                    float dx = x + 0.5f - cx, dy = y + 0.5f - cy;
+                    float d = Mathf.Sqrt(dx * dx + dy * dy);
+                    float ang = Mathf.Atan2(dy, dx);
+                    // 角度で半径を揺らす=ゴツゴツした岩の輪郭(決定的)
+                    float rr = baseR * (1f + 0.20f * Mathf.Sin(ang * 5f + 0.7f)
+                                           + 0.12f * Mathf.Sin(ang * 8f + 2.1f)
+                                           + 0.08f * Mathf.Cos(ang * 3f));
+                    float a = Mathf.Clamp01((rr - d) / 1.5f);
+                    if (a <= 0f) { px[y * size + x] = new Color32(0, 0, 0, 0); continue; }
+                    // 上(y大)ほど明るく=立体感。tint で鉱石色に。
+                    float sh = Mathf.Clamp01(0.62f + 0.42f * (dy / baseR));
+                    byte v = (byte)(sh * 255f);
+                    px[y * size + x] = new Color32(v, v, v, (byte)(a * 255f));
+                }
+            tex.SetPixels32(px);
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), size);
         }
 
         // 中空リング(選択ハイライト用)。thickness = 半径に対する肉厚比。
