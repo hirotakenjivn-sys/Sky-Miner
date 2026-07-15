@@ -812,22 +812,28 @@ namespace SpaceMining.Game
             DrawPopups();         // 到着時の「+数量」上昇フェード(ワールド追従)
         }
 
-        // 採掘中(phase==Mining)の船の頭上に進捗ゲージを描く。
+        // 採掘中(phase==Mining)の採掘ロボットの頭上に進捗ゲージを描く。
         void DrawMiningGauges()
         {
-            // ゲージ長は採掘ロボット(船マーカー)の画面径に連動し、その 1/2 とする。
             float pxPerWorld = Screen.height / (2f * _ctrl.Cam.orthographicSize);
-            float markerPx = _ctrl.CurrentIconWorld * 0.42f * pxPerWorld;  // マーカーの画面径
-            float gw = markerPx * 0.5f;                 // = ロボットの半分の長さ
+            float iconWorld = _ctrl.CurrentIconWorld;
+            float robotPx = iconWorld * 0.28f * pxPerWorld;   // ロボの画面高(scale と一致)
+            float gw = robotPx * 0.9f;                         // ゲージ長 ≒ ロボの幅
             float gh = Mathf.Max(2f, gw * 0.16f);
             foreach (var kv in _rt)
             {
                 var rt = kv.Value;
                 if (!rt.visible || rt.phase != Phase.Mining) continue;
-                Vector3 sp = _ctrl.Cam.WorldToScreenPoint(new Vector3(rt.worldPos.x, rt.worldPos.y, 0));
+                // ロボ位置=採掘スポットから接線方向へオフセット(UpdateMiningRobot と同じ 0.18)。
+                Vector2 spot = rt.worldPos;
+                Vector2 nrm = spot.sqrMagnitude > 1e-4f ? spot.normalized : Vector2.up;
+                Vector2 tangent = new Vector2(-nrm.y, nrm.x);
+                Vector2 rpos = spot + tangent * (iconWorld * 0.18f);
+                float headTopY = rpos.y + iconWorld * 0.28f * 0.90f;   // 足元ピボット→頭頂へ
+                Vector3 sp = _ctrl.Cam.WorldToScreenPoint(new Vector3(rpos.x, headTopY, 0f));
                 if (sp.z < 0) continue;
                 float gx = sp.x - gw * 0.5f;
-                float gy = Screen.height - sp.y - markerPx * 0.5f - gh - 4f;   // マーカーの上端の少し上
+                float gy = Screen.height - sp.y - gh - 4f;   // 頭頂の少し上
                 float prog = Mathf.Clamp01(rt.mineProgress);
                 GUI.DrawTexture(new Rect(gx - 1, gy - 1, gw + 2, gh + 2), _texGaugeFrame);
                 GUI.DrawTexture(new Rect(gx, gy, gw, gh), _texGaugeBg);
