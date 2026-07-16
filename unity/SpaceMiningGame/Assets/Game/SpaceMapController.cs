@@ -94,6 +94,7 @@ namespace SpaceMining.Game
         float _saveTimer;
         Sprite _circle;
         Sprite _oreSprite;   // 採掘パーティクル用の鉱石チャンク(手続き・白基調→tintで鉱石色)
+        Sprite _glowSprite;  // 天体の呼吸ハロー(ソフト発光)
         Sprite _ringSprite;
         float _maxOrtho;
         int _lodTier = 2;
@@ -245,6 +246,7 @@ namespace SpaceMining.Game
             public Transform tr;        // ルート(位置のみ、scale=1)
             public Transform icon;
             public SpriteRenderer sr;
+            public SpriteRenderer glow; // 呼吸ハロー(天体の背面)
             public TextMesh label;
             public Transform labelTr;
             public TextMesh lockMark;   // 🔒(MVP対象外のみ)
@@ -268,6 +270,7 @@ namespace SpaceMining.Game
             SetupCamera();
             _circle = MakeCircleSprite(64);
             _oreSprite = MakeOreSprite(48);
+            _glowSprite = MakeGlowSprite(96);
             _ringSprite = MakeRingSprite(64, 0.14f);
             DrawRings();
             BuildBodies();
@@ -417,6 +420,14 @@ namespace SpaceMining.Game
             go.transform.SetParent(transform, false);
             go.transform.position = new Vector3(b.Pos.x, b.Pos.y, 0);
 
+            // 呼吸ハロー(天体の背面。ソフト発光をゆっくり脈動)。
+            var glowGo = new GameObject("glow");
+            glowGo.transform.SetParent(go.transform, false);
+            var glowSr = glowGo.AddComponent<SpriteRenderer>();
+            glowSr.sprite = _glowSprite;
+            glowSr.color = new Color(0.55f, 0.78f, 1f, 0f);   // 淡いシアン白(αは毎フレーム脈動)
+            glowSr.sortingOrder = 0;                          // アイコン(1/2)より背面
+
             var iconGo = new GameObject("icon");
             iconGo.transform.SetParent(go.transform, false);
             var sr = iconGo.AddComponent<SpriteRenderer>();
@@ -459,7 +470,7 @@ namespace SpaceMining.Game
             return new BodyView
             {
                 body = b, tr = go.transform, icon = iconGo.transform,
-                sr = sr, label = tm, labelTr = lgo.transform, lockMark = lockTm
+                sr = sr, glow = glowSr, label = tm, labelTr = lgo.transform, lockMark = lockTm
             };
         }
 
@@ -684,6 +695,19 @@ namespace SpaceMining.Game
                 if (lmr.enabled != labelOn) lmr.enabled = labelOn;
 
                 v.icon.localScale = Vector3.one * (iconScale * bodyIconScale);
+                // 呼吸ハロー:天体ごとに位相をずらしてゆっくり脈動(可視時のみ)。
+                if (v.glow != null)
+                {
+                    if (v.glow.enabled != visible) v.glow.enabled = visible;
+                    if (visible)
+                    {
+                        float ph = v.body.No * 0.7f;
+                        float pulse = 0.5f + 0.5f * Mathf.Sin(Time.time * 0.8f + ph);
+                        float gScale = iconScale * bodyIconScale * (1.28f + 0.10f * pulse);
+                        v.glow.transform.localScale = Vector3.one * gScale;
+                        var gc = v.glow.color; gc.a = 0.14f + 0.14f * pulse; v.glow.color = gc;
+                    }
+                }
                 if (labelOn)
                 {
                     v.label.text = LabelFor(v.body, _lodTier);
@@ -791,6 +815,25 @@ namespace SpaceMining.Game
                 }
             tex.SetPixels32(px);
             tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), size);
+        }
+
+        // ソフト発光(天体の呼吸ハロー用)。中心=不透明→外周へなめらかにフェード。白基調→tint。
+        static Sprite MakeGlowSprite(int size)
+        {
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+            float r = size * 0.5f;
+            var px = new Color32[size * size];
+            for (int y = 0; y < size; y++)
+                for (int x = 0; x < size; x++)
+                {
+                    float d = Mathf.Sqrt((x - r + 0.5f) * (x - r + 0.5f) + (y - r + 0.5f) * (y - r + 0.5f));
+                    float u = Mathf.Clamp01(d / r);
+                    float a = 1f - u;
+                    a = a * a * a;   // 外周へ急速にフェード=柔らかい光暈
+                    px[y * size + x] = new Color32(255, 255, 255, (byte)(a * 255f));
+                }
+            tex.SetPixels32(px); tex.Apply();
             return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), size);
         }
 
